@@ -1,0 +1,20 @@
+CREATE TABLE `room_infos` (
+  `id` char(32) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `title` varchar(256) DEFAULT NULL,
+  `extends` mediumtext,
+  `status` tinyint DEFAULT NULL,
+  `chat_id` char(32) DEFAULT NULL,
+  `notice` varchar(256) DEFAULT NULL,
+  `cover_url` varchar(256) DEFAULT NULL,
+  `anchor_id` varchar(256) DEFAULT NULL,
+  `anchor_nick` varchar(256) DEFAULT NULL,
+  `meeting_info` mediumtext,
+  `show_code` int NOT NULL,
+  `started_at` datetime DEFAULT NULL,
+  `stopped_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_create_at` (`created_at`),
+  UNIQUE KEY `udx_show_code`(`show_code`)
+) ENGINE=InnoDB

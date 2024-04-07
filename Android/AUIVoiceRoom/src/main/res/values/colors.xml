@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="voicechat_background">#1C1D22</color>
+    <color name="voicechat_white_default">#FCFCFD</color>
+    <color name="voicechat_dialog_background">#23262F</color>
+    <color name="voicechat_iv_border">#3A3D48</color>
+    <color name="voicechat_divider">#23262F</color>
+    <color name="voicechat_default_background">#661C1D22</color>
+    <color name="voicechat_msg_author_color">#80DEEA</color>
+    <color name="voicechat_black_alpha_50">#80000000</color>
+    <color name="voicechat_white_alpha30">#4DFFFFFF</color>
+    <color name="voicechat_toast_background">#141416</color>
+    <color name="voicechat_light_blue">#00BCD4</color>
+    <color name="voicechat_light_white">#B2B7C4</color>
+
+
+
+</resources>

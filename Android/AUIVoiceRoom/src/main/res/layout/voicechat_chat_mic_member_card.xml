@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatMicMemberViewModel" />
+        <import type="com.aliyun.auikits.voicechat.model.entity.ChatMember"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:background="@android:color/black"
+        >
+
+        <com.skyfishjy.library.RippleBackground
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/cir_chat_member_chatting_anim"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:rb_color="@color/voicechat_white_default"
+            app:rb_radius="24dp"
+            app:rb_rippleAmount="3"
+            app:rb_duration="900"
+            app:rb_scale="1.25"
+            app:rb_strokeWidth="6dp"
+            app:animation="@{viewModel.isTalking}"
+            >
+
+
+        </com.skyfishjy.library.RippleBackground>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/cir_chat_member_avatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="6dp"
+            app:imageUrl="@{viewModel.avatar}"
+            app:placeholder="@{@drawable/voicechat_ic_avatar_default}"
+            app:error="@{@drawable/voicechat_ic_avatar_default}"
+            app:civ_border_width="0.5dp"
+            app:civ_border_color="@color/voicechat_iv_border"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:imageResource="drawable/ic_avatar_default_small"
+
+            />
+        <View
+            android:id="@+id/gl_under_chat_member_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginBottom="2dp"
+            app:layout_constraintLeft_toLeftOf="@id/cir_chat_member_avatar"
+            app:layout_constraintRight_toRightOf="@id/cir_chat_member_avatar"
+            app:layout_constraintBottom_toBottomOf="@id/cir_chat_member_avatar"
+            />
+
+        <ImageView
+            android:id="@+id/iv_chat_member_microphone_status"
+            android:src="@drawable/voicechat_ic_microphone_off"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginBottom="-4dp"
+            app:visibleOrGone="@{viewModel.microphoneStatus == ChatMember.MICROPHONE_STATUS_ON ? false : true}"
+            app:layout_constraintRight_toRightOf="@id/cir_chat_member_avatar"
+            app:layout_constraintBottom_toBottomOf="@id/cir_chat_member_avatar"
+            />
+
+
+        <TextView
+            android:id="@+id/tv_chat_member_flag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:text="@{viewModel.identifyFlagTextRes}"
+            android:textSize="7sp"
+            android:textColor="@color/white"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:backgroundResource="@{viewModel.identifyFlagBgRes}"
+            app:layout_constraintTop_toTopOf="@id/gl_under_chat_member_avatar"
+            app:layout_constraintBottom_toBottomOf="@id/gl_under_chat_member_avatar"
+            app:layout_constraintLeft_toLeftOf="@id/cir_chat_member_avatar"
+            app:layout_constraintRight_toRightOf="@id/cir_chat_member_avatar"
+            app:visibleOrGone="@{viewModel.identifyFlag == ChatMember.IDENTIFY_FLAG_AUDIENCE ? false : true}"
+            />
+
+
+        <include
+            android:id="@+id/llay_chat_member_display"
+            layout="@layout/voicechat_chat_member_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/cir_chat_member_avatar"
+            app:layout_constraintLeft_toLeftOf="@id/cir_chat_member_avatar"
+            app:layout_constraintRight_toRightOf="@id/cir_chat_member_avatar"
+            android:layout_marginTop="8dp"
+            app:viewModel="@{viewModel}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatMemberListViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:background="@android:color/black"
+        >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/cir_chat_member_list_avatar"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:imageUrl="@{viewModel.avatar}"
+            app:placeholder="@{@drawable/voicechat_ic_avatar_default}"
+            app:error="@{@drawable/voicechat_ic_avatar_default}"
+            app:civ_border_width="0.5dp"
+            app:civ_border_color="@color/voicechat_iv_border"
+            tools:imageResource="drawable/ic_avatar_default_small"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tv_chat_member_list_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/voicechat_text_style_12"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="9dp"
+            android:text="@{viewModel.name}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/cir_chat_member_list_avatar"
+            tools:text="我要回天庭"
+            />
+
+
+        <TextView
+            android:id="@+id/tv_chat_member_list_flag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@{viewModel.identifyFlagTextRes}"
+            android:textSize="10sp"
+            android:textColor="@color/white"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:backgroundResource="@{viewModel.identifyFlagBgRes}"
+            app:layout_constraintTop_toBottomOf="@id/tv_chat_member_list_name"
+            app:layout_constraintLeft_toLeftOf="@id/tv_chat_member_list_name"
+            />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

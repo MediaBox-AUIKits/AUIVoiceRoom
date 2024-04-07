@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatSoundMixViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:background="@android:color/black"
+        >
+
+        <ImageView
+            android:id="@+id/iv_effect_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:imageResource="@{viewModel.effectImage}"
+            android:selected="@{viewModel.selected}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:padding="0.5dp"
+            android:background="@drawable/voicechat_chat_sound_effect_bg"
+            tools:imageResource="drawable/ic_avatar_default_small"
+            />
+
+
+        <TextView
+            android:id="@+id/tv_effect_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{viewModel.effectName}"
+            style="@style/voicechat_text_style_12"
+            android:textSize="10sp"
+            android:singleLine="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_effect_image"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

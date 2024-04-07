@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatSoundEffectViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:background="@android:color/black"
+        >
+
+
+
+        <LinearLayout
+            android:id="@+id/llay_laughter"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/voicechat_text_style_12"
+                android:text="@{viewModel.effectName}"
+                />
+
+            <SeekBar
+                android:id="@+id/sk_effect_volume"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="32dp"
+                android:onProgressChanged="@{viewModel.onEffectVolumeChanged}"
+                android:progress="@{viewModel.effectVolume}"
+                android:max="100"
+                android:thumbTint="@color/voicechat_white_default"
+                android:progressTint="@color/voicechat_white_default"
+
+                />
+
+            <Button
+                android:id="@+id/btn_play"
+                android:layout_width="48dp"
+                android:layout_height="22dp"
+                android:text="@{viewModel.isPlaying ? @string/voicechat_stop : @string/voicechat_audition}"
+                style="@style/voicechat_text_style_12"
+                android:layout_marginStart="16dp"
+                android:gravity="center"
+                android:background="@drawable/voicechat_chat_btn_r11_bg"
+                android:selected="@{viewModel.isPlaying}"
+                android:textColor="@{viewModel.isPlaying ? @color/voicechat_light_blue : @color/voicechat_light_white}"
+                />
+
+            <Button
+                android:id="@+id/btn_apply"
+                android:layout_width="48dp"
+                android:layout_height="22dp"
+                android:text="@string/voicechat_use"
+                android:gravity="center"
+                style="@style/voicechat_text_style_12"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/voicechat_chat_btn_r11_bg"
+                />
+
+        </LinearLayout>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

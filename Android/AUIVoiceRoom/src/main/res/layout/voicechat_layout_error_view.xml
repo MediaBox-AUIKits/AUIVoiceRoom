@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginTop="-40dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/description"
+            style="@style/voicechat_text_style_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="30dp"
+            android:gravity="center"
+            android:text="@string/voicechat_failed_to_connect_network"
+             />
+
+        <com.aliyun.auikits.voicechat.widget.view.StateTextView
+            android:id="@+id/btn_retry"
+            style="@style/voicechat_text_style_16"
+            android:layout_width="120dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/voicechat_retry"
+            android:background="@drawable/voicechat_btn_retry_bg"
+            android:textColor="@color/voicechat_white_default" />
+
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

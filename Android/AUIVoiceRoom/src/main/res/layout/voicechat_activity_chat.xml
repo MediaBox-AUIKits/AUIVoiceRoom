@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatViewModel" />
+        <import type="android.text.TextUtils"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@drawable/voicechat_chat_bg"
+        >
+
+        <include
+            android:id="@+id/llay_chat_header"
+            layout="@layout/voicechat_activity_chat_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:viewModel="@{viewModel.headerViewModel}" />
+
+
+        <include
+            android:id="@+id/llay_chat_compere_display"
+            layout="@layout/voicechat_chat_mic_member_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/llay_chat_header"
+            app:layout_constraintLeft_toLeftOf="@id/llay_chat_header"
+            app:layout_constraintRight_toRightOf="@id/llay_chat_header"
+            android:layout_marginTop="16dp"
+            app:viewModel="@{viewModel.compereViewModel}" />
+
+
+
+        <include
+            android:id="@+id/i_chat_footer"
+            layout="@layout/voicechat_activity_chat_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:viewModel="@{viewModel.toolbarViewModel}" />
+
+
+        <include
+            android:id="@+id/i_chat_list"
+            layout="@layout/voicechat_activity_chat_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llay_chat_compere_display"
+            app:layout_constraintBottom_toTopOf="@id/i_chat_footer"
+            />
+
+        <include
+            android:id="@+id/i_chat_connect_op"
+            layout="@layout/voicechat_chat_connect_op"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="26dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/i_chat_list"
+            app:viewModel="@{viewModel.chatConnectViewModel}"
+            app:visibleOrGone="@{viewModel.chatConnectViewModel.isCompereMode ? false : true}"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

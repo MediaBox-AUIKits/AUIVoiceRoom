@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 当视图选中时使用的图片 -->
+    <item android:drawable="@drawable/voicechat_ic_selected" android:state_selected="true" />
+    <!-- 默认情况下使用的图片 -->
+    <item android:drawable="@drawable/voicechat_transparent_bg" />
+</selector>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatMessageViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:background="@android:color/black"
+        >
+
+        <TextView
+            android:id="@+id/tv_chat_msg_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxWidth="244dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:text="@{viewModel.content}"
+            style="@style/voicechat_text_style_12"
+            android:background="@drawable/voicechat_chat_message_bg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Long text that needs to wrap and might go below the image view if it is too long. jfdlksjfkldsj lsdjlfkj sdldfjlksd jflkdsj flsdjl fjsdkl fjkldsjf lsdjflk sj"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

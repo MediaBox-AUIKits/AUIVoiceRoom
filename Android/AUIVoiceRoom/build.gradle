@@ -1,0 +1,81 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdk androidCompileSdkVersion
+
+    defaultConfig {
+        minSdk androidMinSdkVersion
+        targetSdk androidTargetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME : 'voicechat']
+            }
+        }
+    }
+
+    buildFeatures {
+        dataBinding = true
+    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation externalAndroidXAppcompat
+    implementation externalAndroidDesign
+    implementation externalAndroidXConstraintlayout
+    testImplementation externalJunit
+    androidTestImplementation externalTestJunit
+    androidTestImplementation externalEspresso
+    implementation externalAndroidAnnotation
+    implementation externalPermissionX
+    implementation externalOKHTTP
+    implementation externalOKHTTPLogInterceptor
+
+    implementation externalRetrofit
+    implementation externalRetrofitGsonConverter
+    implementation externalDialogPlus
+    implementation externalCircleImageView
+    api externalHawk
+    implementation externalRecyclerViewAdapterHelper
+    api externalGlide
+    annotationProcessor externalGlideProcessor
+    implementation externalGlideOkHttp
+    //随机名字库
+    implementation 'com.github.javafaker:javafaker:1.0.2'
+    implementation externalStyleableToast
+    implementation externalRipplebackground
+    implementation externalRxJava
+    implementation externalRxAndroid
+    implementation externalRxJavaRetrofit
+
+
+    implementation externalStatusBarUtil
+
+    implementation externalSmartRefreshLayutKernel     //核心必须依赖
+    implementation externalSmartRefreshLayutHeader    //经典刷新头
+    implementation externalSmartRefreshLayutFooter   //经典加载
+
+
+    implementation externalARouter
+    annotationProcessor externalARouterCompiler
+
+    implementation project(':AUIBaseKits:AUIMessage')
+    implementation project(path: ':AUIVoiceRoomEngine')
+    implementation externalAllInOne
+}

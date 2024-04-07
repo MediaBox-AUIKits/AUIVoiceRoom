@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+# mysql.sql
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://*****:3306/****?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: r*****
+    password: p*****
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+    default-property-inclusion: non_null
+
+#mybatis
+mybatis-plus:
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.aliyuncs.aui.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    default-statement-timeout: 10
+
+# pop配置
+biz:
+  openapi:
+    access:
+      key: daeewe*****
+      secret: we2wewe******
+  new_im:
+      appId: "0c8xxxxx"
+      appKey: "586fxxxxxx"
+      appSign:  "232sfxxxxxx"
+  live_mic:
+    app_id: 7c61********
+    app_key: c461b*********
+http:
+  cors:
+    host: "*"

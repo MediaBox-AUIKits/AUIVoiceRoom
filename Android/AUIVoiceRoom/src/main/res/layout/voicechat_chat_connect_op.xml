@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatConnectViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:background="@android:color/black"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@{viewModel.isChatConnected? @drawable/voicechat_chat_connect_bg : @drawable/voicechat_chat_disconnect_bg}"
+            android:onClick="@{viewModel::onConnectSwitch}"
+            >
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:src="@drawable/voicechat_ic_microphone"
+                />
+
+            <TextView
+
+                android:id="@+id/tv_chat_connect_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="14dp"
+                style="@style/voicechat_text_style_12"
+                android:text="@{viewModel.isChatConnected? @string/voicechat_chat_disconnect : @string/voicechat_chat_connect}"
+
+                />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatHeaderViewModel" />
+        <import type="android.text.TextUtils"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:background="@android:color/black"
+        >
+
+        <TextView
+            android:id="@+id/tv_chat_room_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="3dp"
+            style="@style/voicechat_text_style_12"
+            android:text="@{viewModel.title}"
+            tools:text="xxxx的房间"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tv_chat_room_id_prefix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            style="@style/voicechat_text_style_12"
+            android:text="@string/voicechat_chat_room_prefix"
+            tools:text="1231"
+            app:layout_constraintTop_toBottomOf="@id/tv_chat_room_title"
+            app:layout_constraintLeft_toLeftOf="@id/tv_chat_room_title"
+            />
+
+        <TextView
+            android:id="@+id/tv_chat_room_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/voicechat_text_style_12"
+            android:text="@{viewModel.id}"
+            tools:text="1231"
+            android:maxWidth="80dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_room_id_prefix"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_room_id_prefix"
+            app:layout_constraintLeft_toRightOf="@id/tv_chat_room_id_prefix"
+            />
+
+        <ImageView
+            android:id="@+id/iv_chat_room_id_copy"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/voicechat_ic_copy"
+            android:onClick="@{viewModel::onRoomIdCopyClick}"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_room_id"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_room_id"
+            app:layout_constraintLeft_toRightOf="@id/tv_chat_room_id"
+            >
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/iv_chat_close"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/voicechat_ic_close"
+            android:layout_marginEnd="20dp"
+            android:onClick="@{viewModel::onRoomCloseClick}"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_room_title"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_room_id"
+            app:layout_constraintRight_toRightOf="parent"
+            >
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:gravity="center"
+            android:background="@drawable/voicechat_chat_member_list_entry_bg"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:onClick="@{viewModel::onMemberListClick}"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_room_title"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_room_id"
+            app:layout_constraintRight_toLeftOf="@id/iv_chat_close"
+            >
+
+            <TextView
+                android:id="@+id/tv_chat_member_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/voicechat_text_style_12"
+                android:text="@{viewModel.memberNum}"
+                tools:text="999+"
+                />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/iv_chat_compere"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="4dp"
+                app:imageUrl="@{viewModel.compereAvatar}"
+                app:placeholder="@{@drawable/voicechat_ic_avatar_default}"
+                app:error="@{@drawable/voicechat_ic_avatar_default}"
+                tools:src="@drawable/voicechat_ic_avatar_default"
+                >
+            </de.hdodenhof.circleimageview.CircleImageView>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/iv_chat_network_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/voicechat_text_style_12"
+            android:text="@{viewModel.networkStatusTextRes}"
+            android:textSize="10sp"
+            app:layout_constraintTop_toBottomOf="@id/tv_chat_room_id"
+            app:layout_constraintRight_toRightOf="@id/iv_chat_close"
+            tools:text="网络正常"
+            />
+
+        <ImageView
+            android:id="@+id/iv_chat_network"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:imageResource="@{viewModel.networkStatusIconRes}"
+            android:layout_marginEnd="3dp"
+            app:layout_constraintTop_toTopOf="@id/iv_chat_network_status"
+            app:layout_constraintBottom_toBottomOf="@id/iv_chat_network_status"
+            app:layout_constraintRight_toLeftOf="@id/iv_chat_network_status"
+            >
+        </ImageView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

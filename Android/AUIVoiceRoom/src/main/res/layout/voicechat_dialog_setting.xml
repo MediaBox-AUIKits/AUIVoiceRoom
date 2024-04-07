@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatSettingViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/voicechat_background"
+            tools:background="@android:color/black"
+            >
+
+            <FrameLayout
+                android:id="@+id/llay_dialog_header"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:orientation="vertical"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                >
+
+                <TextView
+                    android:id="@+id/tv_dialog_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/voicechat_text_style_14"
+                    android:text="@string/voicechat_setting"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    />
+
+                <View
+                    android:id="@+id/chat_member_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/voicechat_divider"
+                    android:layout_gravity="bottom"
+                    />
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/llay_earback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="18dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/llay_dialog_header"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/voicechat_text_style_12"
+                    android:text="@string/voicechat_earback"
+                    />
+
+                <Switch
+                    android:id="@+id/sw_earback_switch"
+                    android:layout_marginStart="32dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="@{viewModel.earbackSwitch}"
+                    android:track="@drawable/voicechat_chat_switch_track"
+                    android:thumb="@drawable/voicechat_chat_switch_thumb"
+                    style="@style/voicechat_text_style_12"
+                    android:onCheckedChanged="@{viewModel.onEarbackSwitchChange}"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/voicechat_text_style_12"
+                    android:layout_marginStart="12dp"
+                    android:text="@{viewModel.earbackSwitch ? @string/voicechat_switch_on : @string/voicechat_switch_off}"
+                    />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_reverb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/voicechat_text_style_12"
+                android:text="@string/voicechat_reverb"
+                android:layout_marginTop="24dp"
+                app:layout_constraintLeft_toLeftOf="@id/llay_earback"
+                app:layout_constraintTop_toBottomOf="@id/llay_earback"
+                />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_reverb_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="12dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_reverb"
+                />
+
+            <TextView
+                android:id="@+id/tv_change_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/voicechat_text_style_12"
+                android:text="@string/voicechat_change_voice"
+                android:layout_marginTop="24dp"
+                app:layout_constraintLeft_toLeftOf="@id/llay_earback"
+                app:layout_constraintTop_toBottomOf="@id/rv_reverb_list"
+                />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_voice_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginBottom="24dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_change_voice"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+
+</layout>

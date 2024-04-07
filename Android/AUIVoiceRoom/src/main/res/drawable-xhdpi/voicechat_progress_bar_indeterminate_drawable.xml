@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:tint="@color/voicechat_white_alpha30"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+
+    <group
+        android:name="root"
+        android:translateX="16.0"
+        android:translateY="16.0">
+        <path
+            android:name="progressBar"
+            android:fillColor="#00000000"
+            android:pathData="M0, 0 m 0, -14 a 14,14 0 1,1 0,28 a 14,14 0 1,1 0,-28"
+            android:strokeWidth="4"
+            android:strokeColor="@color/white"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:trimPathStart="0"
+            android:trimPathEnd="0"
+            android:trimPathOffset="0" />
+    </group>
+
+</vector>

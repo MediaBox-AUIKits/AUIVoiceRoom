@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.aliyun.auikits.voicechat.vm.ChatToolbarViewModel" />
+        <import type="android.text.TextUtils"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:background="@android:color/black"
+        >
+
+        <LinearLayout
+            android:id="@+id/llay_chat_room_footer_controller"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginEnd="20dp"
+            android:orientation="horizontal"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            >
+
+            <ImageView
+                android:id="@+id/iv_chat_mute"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="12dp"
+                android:src="@{viewModel.volumeSwitch ? @drawable/voicechat_ic_volume_on : @drawable/voicechat_ic_volume_off}"
+                android:onClick="@{viewModel::onVolumeSwitchChange}"
+                />
+
+            <ImageView
+                android:id="@+id/iv_chat_microphone"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="12dp"
+                android:imageResource="@{viewModel.microphoneIconRes}"
+                android:onClick="@{viewModel::onMicrophoneChange}"
+                />
+
+            <ImageView
+                android:id="@+id/iv_chat_music"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/voicechat_ic_music"
+                android:onClick="@{viewModel::onMusicClick}"
+                android:visibility="gone"
+                />
+
+            <ImageView
+                android:id="@+id/iv_chat_sound_effect"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="12dp"
+                android:enabled="@{viewModel.soundEffectEnable}"
+                android:src="@{viewModel.soundEffectEnable ? @drawable/voicechat_ic_sound_effect : @drawable/voicechat_ic_sound_effect_disabled}"
+                android:onClick="@{viewModel::onSoundEffectClick}"
+                android:visibility="gone"
+
+                />
+
+            <ImageView
+                android:id="@+id/iv_chat_setting"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:enabled="@{viewModel.settingEnable}"
+                android:src="@{viewModel.settingEnable ? @drawable/voicechat_ic_setting : @drawable/voicechat_ic_setting_disabled}"
+                android:onClick="@{viewModel::onSettingClick}"
+                android:layout_marginStart="12dp"
+                android:visibility="gone"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/et_chat_room_msg_input"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            style="@style/voicechat_text_style_12"
+            android:text="@string/voicechat_chat_msg_input_hint"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/voicechat_chat_msg_input_bg"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:gravity="center_vertical"
+            android:onClick="@{viewModel.onInputMsgClick}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@id/llay_chat_room_footer_controller"
+            app:layout_constraintBottom_toBottomOf="@id/llay_chat_room_footer_controller"
+            app:layout_constraintRight_toLeftOf="@id/llay_chat_room_footer_controller"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
