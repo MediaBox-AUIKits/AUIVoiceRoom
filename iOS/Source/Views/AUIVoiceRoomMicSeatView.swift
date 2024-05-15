@@ -15,7 +15,7 @@ import AUIRoomCore
 open class AUIVoiceRoomMicSeatCell: UIView {
     
     public convenience init(_ seatInfo: AUIVoiceRoomMicSeatInfo) {
-        self.init(frame: CGRectZero, seatInfo: seatInfo)
+        self.init(frame: CGRect.zero, seatInfo: seatInfo)
     }
     
     public init(frame: CGRect, seatInfo: AUIVoiceRoomMicSeatInfo) {
@@ -58,8 +58,8 @@ open class AUIVoiceRoomMicSeatCell: UIView {
             make.left.equalTo(self.networkStatusView.snp.right).offset(2)
         }
         
-        self.addSubview(self.flagLabel)
-        self.flagLabel.snp.makeConstraints { make in
+        self.addSubview(self.roleLabel)
+        self.roleLabel.snp.makeConstraints { make in
             make.width.equalTo(21)
             make.height.equalTo(12)
             make.bottom.equalTo(self.avatarView)
@@ -72,7 +72,7 @@ open class AUIVoiceRoomMicSeatCell: UIView {
             make.right.bottom.equalTo(self.avatarView)
         }
         
-        self.updateSeatUser()
+        self.updateSeatUser(startIndex: 0)
     }
     
     public required init?(coder: NSCoder) {
@@ -113,7 +113,7 @@ open class AUIVoiceRoomMicSeatCell: UIView {
         return label
     }()
     
-    public lazy var flagLabel: UILabel = {
+    public lazy var roleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.white
         label.textAlignment = .center
@@ -127,18 +127,18 @@ open class AUIVoiceRoomMicSeatCell: UIView {
     public let seatInfo: AUIVoiceRoomMicSeatInfo
     
     
-    open func updateSeatUser() {
+    open func updateSeatUser(startIndex: Int32) {
         if let user = self.seatInfo.user {
             self.nameLabel.text = user.userNick
             self.avatarView.sd_setImage(with: URL(string: user.userAvatar), placeholderImage: AUIVoiceRoomBundle.getCommonImage("ic_default_avatar"))
         }
         else {
-            self.nameLabel.text = "\(self.seatInfo.index)" + (AUIVoiceRoomBundle.getString("号麦") ?? "号麦")
+            self.nameLabel.text = "\(self.seatInfo.index + startIndex)" + (AUIVoiceRoomBundle.getString("号麦") ?? "号麦")
             self.avatarView.image = AUIVoiceRoomBundle.getCommonImage("ic_mic_seat")
         }
         self.updateSeatUserMuteMic()
         self.updateSeatUserNetworkStatus()
-        self.updateFlag()
+        self.updateRole()
     }
     
     open func updateSeatUserMuteMic() {
@@ -155,7 +155,7 @@ open class AUIVoiceRoomMicSeatCell: UIView {
     
     open func updateSeatUserNetworkStatus() {
         
-        var status = AUIRoomNetworkState.Unknow
+        var status = ARTCRoomNetworkState.Unknow
         if self.seatInfo.isJoin {
             if self.seatInfo.isPublishStream == false {
                 status = .Bad
@@ -191,28 +191,28 @@ open class AUIVoiceRoomMicSeatCell: UIView {
         }
     }
     
-    open func updateFlag() {
+    open func updateRole() {
         if self.seatInfo.isAnchor {
-            self.flagLabel.isHidden = false
-            self.flagLabel.text = AUIVoiceRoomBundle.getString("主持")
-            self.flagLabel.backgroundColor = UIColor.av_color(withHexString: "#00BCD4")
+            self.roleLabel.isHidden = false
+            self.roleLabel.text = AUIVoiceRoomBundle.getString("主持")
+            self.roleLabel.backgroundColor = UIColor.av_color(withHexString: "#00BCD4")
         }
         else if self.seatInfo.isMe {
-            self.flagLabel.isHidden = false
-            self.flagLabel.text = AUIVoiceRoomBundle.getString("自己")
-            self.flagLabel.backgroundColor = UIColor.av_color(withHexString: "#0077FA")
+            self.roleLabel.isHidden = false
+            self.roleLabel.text = AUIVoiceRoomBundle.getString("自己")
+            self.roleLabel.backgroundColor = UIColor.av_color(withHexString: "#0077FA")
         }
         else {
-            self.flagLabel.isHidden = true
+            self.roleLabel.isHidden = true
         }
     }
 }
 
 open class AUIVoiceRoomMicSeatView: UIView {
     
-    public init(roomInfo: AUIVoiceRoomInfo) {
+    public init(roomInfo: ARTCVoiceRoomInfo) {
         self.roomInfo = roomInfo
-        super.init(frame: CGRectZero)
+        super.init(frame: CGRect.zero)
         
         self.addSubview(self.anchorSeatView)
         for seat in self.seatViewList {
@@ -254,9 +254,12 @@ open class AUIVoiceRoomMicSeatView: UIView {
         }
     }
     
-    public let roomInfo: AUIVoiceRoomInfo
+    public let roomInfo: ARTCVoiceRoomInfo
     public var isAnchorSeatViewMiddle: Bool = true {
         didSet {
+            self.seatViewList.forEach { cell in
+                cell.updateSeatUser(startIndex: self.isAnchorSeatViewMiddle ? 0 : 1)
+            }
             self.setNeedsLayout()
         }
     }
@@ -297,7 +300,7 @@ open class AUIVoiceRoomMicSeatView: UIView {
     
     open func updateMicSeatInfo(seatIndex: Int32) {
         if let seatCell = self.findMicSeatCell(seatIndex: seatIndex) {
-            seatCell.updateSeatUser()
+            seatCell.updateSeatUser(startIndex: self.isAnchorSeatViewMiddle ? 0 : 1)
         }
     }
     

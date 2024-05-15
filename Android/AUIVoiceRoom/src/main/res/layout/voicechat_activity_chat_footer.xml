@@ -53,8 +53,8 @@
                 android:layout_height="32dp"
                 android:layout_marginStart="12dp"
                 android:src="@drawable/voicechat_ic_music"
+                android:visibility="@{viewModel.musicVisibility}"
                 android:onClick="@{viewModel::onMusicClick}"
-                android:visibility="gone"
                 />
 
             <ImageView
@@ -66,7 +66,6 @@
                 android:src="@{viewModel.soundEffectEnable ? @drawable/voicechat_ic_sound_effect : @drawable/voicechat_ic_sound_effect_disabled}"
                 android:onClick="@{viewModel::onSoundEffectClick}"
                 android:visibility="gone"
-
                 />
 
             <ImageView
@@ -78,7 +77,6 @@
                 android:src="@{viewModel.settingEnable ? @drawable/voicechat_ic_setting : @drawable/voicechat_ic_setting_disabled}"
                 android:onClick="@{viewModel::onSettingClick}"
                 android:layout_marginStart="12dp"
-                android:visibility="gone"
                 />
 
         </LinearLayout>

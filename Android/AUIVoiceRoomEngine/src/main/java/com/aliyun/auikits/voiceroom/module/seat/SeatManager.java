@@ -14,5 +14,5 @@ public interface SeatManager {
     void leaveSeat(SeatInfo seat, ActionCallback callback);
 
     //查询麦位列表
-    void getSeatList(RoomInfo roomInfo, ActionCallback callback);
+    void getSeatList(String roomId, ActionCallback callback);
 }

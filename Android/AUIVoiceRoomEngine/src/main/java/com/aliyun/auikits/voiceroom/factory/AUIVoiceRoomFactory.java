@@ -2,15 +2,16 @@ package com.aliyun.auikits.voiceroom.factory;
 
 import android.os.Looper;
 
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
-import com.aliyun.auikits.voiceroom.impl.AUIVoiceRoomImpl;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+import com.aliyun.auikits.voiceroom.impl.AUIVoiceRoomImplV2;
 
 public class AUIVoiceRoomFactory {
-    public static AUIVoiceRoom createVoiceRoom(){
+    public static ARTCVoiceRoomEngine createVoiceRoom(){
         return createVoiceRoom(Looper.getMainLooper());
     }
 
-    public static AUIVoiceRoom createVoiceRoom(Looper l){
-        return new AUIVoiceRoomImpl(l);
+    public static ARTCVoiceRoomEngine createVoiceRoom(Looper l){
+//        return new AUIVoiceRoomImpl(l);
+        return new AUIVoiceRoomImplV2();
     }
 }

@@ -10,6 +10,10 @@ public class ChatMusicItem implements Serializable {
     private String url;
 
     private boolean isPlaying = false;
+    private boolean applying = false;
+
+    private int soundId = -1;
+    private int volume = 50;
 
     public ChatMusicItem() {
 
@@ -43,6 +47,30 @@ public class ChatMusicItem implements Serializable {
 
     public boolean isPlaying() {
         return isPlaying;
+    }
+
+    public boolean isApplying() {
+        return applying;
+    }
+
+    public void setApplying(boolean applying) {
+        this.applying = applying;
+    }
+
+    public int getSoundId() {
+        return soundId;
+    }
+
+    public void setSoundId(int soundId) {
+        this.soundId = soundId;
+    }
+
+    public int getVolume() {
+        return volume;
+    }
+
+    public void setVolume(int volume) {
+        this.volume = volume;
     }
 
     public void setPlaying(boolean playing) {

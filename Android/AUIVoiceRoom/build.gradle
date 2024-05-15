@@ -77,5 +77,6 @@ dependencies {
 
     implementation project(':AUIBaseKits:AUIMessage')
     implementation project(path: ':AUIVoiceRoomEngine')
+    implementation externalAUIRoomEngine
     implementation externalAllInOne
 }

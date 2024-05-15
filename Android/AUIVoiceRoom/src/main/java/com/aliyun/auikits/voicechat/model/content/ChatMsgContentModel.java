@@ -12,8 +12,8 @@ import com.aliyun.auikits.voicechat.model.entity.ChatMessage;
 import com.aliyun.auikits.voicechat.model.entity.ChatRoom;
 import com.aliyun.auikits.voicechat.model.entity.ChatRoomCallback;
 import com.aliyun.auikits.voicechat.widget.card.CardTypeDef;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoomCallback;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngineDelegate;
 import com.aliyun.auikits.voiceroom.bean.UserInfo;
 
 import java.lang.ref.WeakReference;
@@ -22,10 +22,10 @@ import java.util.List;
 
 public class ChatMsgContentModel extends AbsContentModel<CardEntity> {
     private ChatRoom chatRoom;
-    private AUIVoiceRoom roomController;
-    private AUIVoiceRoomCallback roomCallback;
+    private ARTCVoiceRoomEngine roomController;
+    private ARTCVoiceRoomEngineDelegate roomCallback;
     private WeakReference<Context> contextRef;
-    public ChatMsgContentModel(Context context, ChatRoom chatRoom, AUIVoiceRoom roomController) {
+    public ChatMsgContentModel(Context context, ChatRoom chatRoom, ARTCVoiceRoomEngine roomController) {
         super();
         this.chatRoom = chatRoom;
         this.roomController = roomController;
@@ -33,7 +33,7 @@ public class ChatMsgContentModel extends AbsContentModel<CardEntity> {
         this.roomCallback = new ChatRoomCallback() {
 
             @Override
-            public void onUserJoinMic(UserInfo user) {
+            public void onJoinedMic(UserInfo user) {
                 Context context1 = ChatMsgContentModel.this.contextRef.get();
 
                 //主持人加入麦不添加进消息列表
@@ -52,7 +52,7 @@ public class ChatMsgContentModel extends AbsContentModel<CardEntity> {
             }
 
             @Override
-            public void onUserLeaveMic(UserInfo user) {
+            public void onLeavedMic(UserInfo user) {
                 Context context1 = ChatMsgContentModel.this.contextRef.get();
                 //主持人离开麦不添加进消息列表
                 if(context1 != null && user.micPosition > 0) {
@@ -70,7 +70,7 @@ public class ChatMsgContentModel extends AbsContentModel<CardEntity> {
             }
 
             @Override
-            public void onUserOnline(UserInfo user) {
+            public void onJoinedRoom(UserInfo user) {
                 Context context1 = ChatMsgContentModel.this.contextRef.get();
 
                 if(context1 != null) {
@@ -88,7 +88,7 @@ public class ChatMsgContentModel extends AbsContentModel<CardEntity> {
             }
 
             @Override
-            public void onTextMessageReceived(UserInfo user, String text) {
+            public void onReceivedTextMessage(UserInfo user, String text) {
                 CardEntity cardEntity = new CardEntity();
                 cardEntity.cardType = CardTypeDef.CHAT_MESSAGE_CARD;
 
@@ -111,13 +111,13 @@ public class ChatMsgContentModel extends AbsContentModel<CardEntity> {
             }
 
         };
-        this.roomController.addRoomCallback(this.roomCallback);
+        this.roomController.addObserver(this.roomCallback);
     }
 
     @Override
     public void release() {
         super.release();
-        this.roomController.removeRoomCallback(this.roomCallback);
+        this.roomController.removeObserver(this.roomCallback);
     }
 
     @Override

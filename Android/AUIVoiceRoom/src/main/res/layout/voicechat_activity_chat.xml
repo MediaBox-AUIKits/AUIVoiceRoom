@@ -75,7 +75,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/i_chat_list"
             app:viewModel="@{viewModel.chatConnectViewModel}"
-            app:visibleOrGone="@{viewModel.chatConnectViewModel.isCompereMode ? false : true}"
+            app:visibleOrGone="@{viewModel.chatConnectViewModel.showMicEntry ? true : false}"
             />
 
 

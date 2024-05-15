@@ -1,12 +1,13 @@
 package com.aliyun.auikits.voicechat.model.entity;
 
-import com.aliyun.auikits.voiceroom.AUIVoiceRoomCallback;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngineDelegate;
+import com.aliyun.auikits.voiceroom.bean.AccompanyPlayState;
 import com.aliyun.auikits.voiceroom.bean.MicRequestResult;
 import com.aliyun.auikits.voiceroom.bean.UserInfo;
 
 import java.util.List;
 
-public class ChatRoomCallback implements AUIVoiceRoomCallback {
+public class ChatRoomCallback implements ARTCVoiceRoomEngineDelegate {
     @Override
     public void onJoin(String roomId, String uid) {
 
@@ -18,22 +19,22 @@ public class ChatRoomCallback implements AUIVoiceRoomCallback {
     }
 
     @Override
-    public void onUserOnline(UserInfo user) {
+    public void onJoinedRoom(UserInfo user) {
 
     }
 
     @Override
-    public void onUserOffline(UserInfo user) {
+    public void onLeavedRoom(UserInfo user) {
 
     }
 
     @Override
-    public void onUserJoinMic(UserInfo user) {
+    public void onJoinedMic(UserInfo user) {
 
     }
 
     @Override
-    public void onUserLeaveMic(UserInfo user) {
+    public void onLeavedMic(UserInfo user) {
 
     }
 
@@ -43,27 +44,27 @@ public class ChatRoomCallback implements AUIVoiceRoomCallback {
     }
 
     @Override
-    public void onTextMessageReceived(UserInfo user, String text) {
+    public void onReceivedTextMessage(UserInfo user, String text) {
 
     }
 
     @Override
-    public void onUserMicOn(UserInfo user) {
+    public void onMicUserMicrophoneChanged(UserInfo user, boolean open) {
 
     }
 
     @Override
-    public void onUserMicOff(UserInfo user) {
+    public void onMicUserSpeakStateChanged(UserInfo user) {
 
     }
 
     @Override
-    public void onUserSpeakState(UserInfo user) {
+    public void onNetworkStateChanged(UserInfo user) {
 
     }
 
     @Override
-    public void onUserNetworkState(UserInfo user) {
+    public void onError(int code, String msg) {
 
     }
 
@@ -73,7 +74,7 @@ public class ChatRoomCallback implements AUIVoiceRoomCallback {
     }
 
     @Override
-    public void onKickOut() {
+    public void onKickOutRoom() {
 
     }
 
@@ -98,7 +99,17 @@ public class ChatRoomCallback implements AUIVoiceRoomCallback {
     }
 
     @Override
+    public void onAccompanyStateChanged(AccompanyPlayState state) {
+
+    }
+
+    @Override
     public void onVoiceRoomDebugInfo(String msg) {
+
+    }
+
+    @Override
+    public void onMemberCountChanged(int count) {
 
     }
 }

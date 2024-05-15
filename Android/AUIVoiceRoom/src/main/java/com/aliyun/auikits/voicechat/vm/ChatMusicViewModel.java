@@ -5,25 +5,37 @@ import android.widget.SeekBar;
 import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModel;
 
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+
 public class ChatMusicViewModel extends ViewModel {
 
     public ObservableInt humanVolume = new ObservableInt(50);
     public ObservableInt musicVolume = new ObservableInt(50);
+    private ARTCVoiceRoomEngine mEngine;
 
-
-    public void bind() {
-        //TODO SDK 绑定当前音量
+    public void bind(ARTCVoiceRoomEngine engine) {
+        this.mEngine = engine;
     }
-
 
     public void onHumanVolumeChanged(SeekBar seekBar, int progress, boolean fromUser) {
         humanVolume.set(progress);
-
-        //TODO SDK 实时变更音量
+        if(mEngine != null){
+            mEngine.setRecordingVolume(humanVolume.get());
+        }
     }
 
     public void onMusicVolumeChanged(SeekBar seekBar, int progress, boolean fromUser) {
         musicVolume.set(progress);
-        //TODO SDK 实时变更音量
+        if(mEngine != null){
+            mEngine.setAccompanyVolume(musicVolume.get());
+        }
+    }
+
+    public int getHumanVolumeInt(){
+        return humanVolume.get();
+    }
+
+    public int getMusicVolumeInt(){
+        return musicVolume.get();
     }
 }

@@ -7,7 +7,6 @@
 
 #import "AVSmallWindow.h"
 #import "UIView+AVHelper.h"
-#import "AVTheme.h"
 
 @interface AVSmallWindowViewController ()
 
@@ -101,11 +100,11 @@
     }
     
     if (CGRectGetMaxX(frame) >= CGRectGetMaxX(rect) - safeInsets.right) {
-        frame.origin.x = CGRectGetMaxX(rect) - safeInsets.right - view.av_width;
+        frame.origin.x = CGRectGetMaxX(rect) - safeInsets.right - CGRectGetWidth(view.bounds);
     }
     
     if (CGRectGetMaxY(frame) >= CGRectGetMaxY(rect) - safeInsets.bottom) {
-        frame.origin.y = CGRectGetMaxY(rect) - safeInsets.bottom - view.av_height;
+        frame.origin.y = CGRectGetMaxY(rect) - safeInsets.bottom - CGRectGetHeight(view.bounds);
     }
     
     [UIView animateWithDuration:0.3 animations:^{

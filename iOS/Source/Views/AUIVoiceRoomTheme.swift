@@ -29,6 +29,14 @@ public class AUIVoiceRoomBundleImp: NSObject {
         guard let key = key else { return nil }
         return AVLocalization.string(withKey: key, withModule: self.bundleName)
     }
+    
+    public func getResourceFullPath(_ path: String) -> String {
+        let final = Bundle.main.resourcePath
+        if let final = final {
+            return final + "/" + self.bundleName + ".bundle/" + path
+        }
+        return path
+    }
 }
 
 public let AUIVoiceRoomBundle = AUIVoiceRoomBundleImp("AUIVoiceRoom")

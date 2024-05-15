@@ -48,8 +48,8 @@
     <string name="voicechat_earback">耳返</string>
     <string name="voicechat_reverb">混响</string>
     <string name="voicechat_change_voice">变声</string>
-    <string name="voicechat_laughter">笑声</string>
-    <string name="voicechat_applause">掌声</string>
+    <string name="voicechat_open">开场</string>
+    <string name="voicechat_applause">鼓掌</string>
     <string name="voicechat_audition">试听</string>
     <string name="voicechat_use">使用</string>
     <string name="voicechat_stop">停止</string>

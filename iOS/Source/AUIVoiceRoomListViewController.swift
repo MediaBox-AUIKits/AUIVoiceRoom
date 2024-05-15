@@ -113,7 +113,7 @@ import MJRefresh
     
     private var userViewList: [UIView] = []
     
-    open var roomInfo: AUIVoiceRoomInfo? = nil {
+    open var roomInfo: ARTCVoiceRoomInfo? = nil {
         didSet {
             self.userViewList.forEach { view in
                 view.removeFromSuperview()
@@ -228,7 +228,11 @@ import MJRefresh
         return btn
     }()
     
-    public lazy var roomList: [AUIVoiceRoomInfo] = [AUIVoiceRoomInfo]()
+    open lazy var roomList: [ARTCVoiceRoomInfo] = [ARTCVoiceRoomInfo]()
+    
+    open func getRoomList(pageNum: Int, pageSize: Int, completed: @escaping (_ roomInfoList: [ARTCVoiceRoomInfo], _ error: NSError?)->Void) {
+        ARTCVoiceRoomEngine.getVoiceRoomList(pageNum: pageNum, pageSize: pageSize, completed: completed)
+    }
 }
 
 extension AUIVoiceRoomListViewController {
@@ -293,7 +297,7 @@ extension AUIVoiceRoomListViewController {
             return
         }
         
-        ARTCVoiceRoomEngine.getRoomList(pageNum: 1, pageSize: 16) { roomInfoList, error in
+        self.getRoomList(pageNum: 1, pageSize: 16) { roomInfoList, error in
             self.collectionView.mj_header!.endRefreshing()
             if error == nil {
                 self.roomList.removeAll()
@@ -331,7 +335,7 @@ extension AUIVoiceRoomListViewController {
             return
         }
         
-        ARTCVoiceRoomEngine.getRoomList(pageNum: self.lastPageNumber, pageSize: 16) { roomInfoList, error in
+        self.getRoomList(pageNum: self.lastPageNumber, pageSize: 16) { roomInfoList, error in
             self.collectionView.mj_footer!.endRefreshing()
             if error == nil {
                 if roomInfoList.isEmpty {

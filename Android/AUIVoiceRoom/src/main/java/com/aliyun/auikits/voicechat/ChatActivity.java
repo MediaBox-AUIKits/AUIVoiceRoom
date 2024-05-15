@@ -17,8 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.aliyun.auikits.voicechat.R;
-import com.aliyun.auikits.voicechat.base.card.CardEntity;
 import com.aliyun.auikits.voicechat.databinding.VoicechatActivityChatBinding;
 import com.aliyun.auikits.voicechat.databinding.VoicechatDialogReconnectBinding;
 import com.aliyun.auikits.voicechat.adapter.ChatItemDecoration;
@@ -41,13 +39,11 @@ import com.aliyun.auikits.voicechat.widget.card.ChatMessageCard;
 import com.aliyun.auikits.voicechat.widget.card.DefaultCardViewFactory;
 import com.aliyun.auikits.voicechat.widget.helper.DialogHelper;
 import com.aliyun.auikits.voicechat.widget.list.CustomViewHolder;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoomCallback;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngineDelegate;
 import com.jaeger.library.StatusBarUtil;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.OnClickListener;
-
-import java.util.List;
 
 @Route(path = "/voicechat/ChatActivity")
 public class ChatActivity extends AppCompatActivity {
@@ -68,8 +64,8 @@ public class ChatActivity extends AppCompatActivity {
     private ContentViewModel chatMsgViewModel;
     private ChatMsgContentModel chatMsgContentModel;
     private ChatRoom chatRoom;
-    private AUIVoiceRoom roomController;
-    private AUIVoiceRoomCallback roomCallback;
+    private ARTCVoiceRoomEngine roomController;
+    private ARTCVoiceRoomEngineDelegate roomCallback;
     private String authorization;
 
     @Override
@@ -102,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onDismissRoom(String commander) {
                 //非主持人收到房间解散信息
-                if(!roomController.isHost()) {
+                if(!roomController.isAnchor()) {
                     ToastHelper.showToast(ChatActivity.this, R.string.voicechat_room_dismiss, Toast.LENGTH_SHORT);
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra(KEY_ROOM_DISMISS, true);
@@ -133,14 +129,13 @@ public class ChatActivity extends AppCompatActivity {
         initChatMicMemberList();
         initChatMessageList();
 
-        this.roomController.addRoomCallback(this.roomCallback);
+        this.roomController.addObserver(this.roomCallback);
     }
 
     private ChatRoom createRoomModel(ChatRoomItem chatRoomItem, ChatMember self) {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setId(chatRoomItem.getRoomId());
         chatRoom.setTitle(chatRoomItem.getTitle());
-        chatRoom.setMemberNum(chatRoomItem.getMemberNum());
 
         chatRoom.setCompere(chatRoomItem.getCompere());
         chatRoom.setSelf(self);
@@ -235,13 +230,17 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.chatMicMemberViewModel.unBind();
-        this.chatMsgViewModel.unBind();
-
-        this.chatViewModel.unBind();
-        this.roomController.removeRoomCallback(this.roomCallback);
-        this.roomController.release();
-        this.roomController = null;
+        if(chatMicMemberViewModel != null)
+            this.chatMicMemberViewModel.unBind();
+        if(chatMsgViewModel != null)
+            this.chatMsgViewModel.unBind();
+        if(chatViewModel != null)
+            this.chatViewModel.unBind();
+        if(roomController != null){
+            this.roomController.removeObserver(this.roomCallback);
+            this.roomController.release();
+            this.roomController = null;
+        }
     }
 
     @Override

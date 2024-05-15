@@ -18,27 +18,27 @@ class MainViewController: AVBaseViewController {
         
         self.titleView.text = "APP首页"
                 
+        ARTCRoomLoginServer.shared.loginServerDomain = VoiceRoomServerDomain
         AVLoginManager.shared.doLogin = { uid, completed in
-            self.appServer.loginApp(uid: uid) { user, error in
-                AUIVoiceRoomManager.shared.setCurrentUser(user)
+            ARTCRoomLoginServer.shared.loginApp(uid: uid) { user, error in
+                if error == nil {
+                    AUIVoiceRoomManager.shared.setup(currentUser: user!, serverAuth: ARTCRoomLoginServer.shared.serverAuth!)
+                }
                 completed(error)
             }
         }
         
         AVLoginManager.shared.doLogout = { uid, completed in
-            AUIRoomService.logout { error in
-                AUIVoiceRoomManager.shared.setCurrentUser(nil)
+            ARTCRoomMessageService.logout { error in
+                ARTCRoomService.currrentUser = nil
                 completed(nil)
             }
+            ARTCRoomLoginServer.shared.logoutApp()
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.showListViewController(ani: false)
         }
-    }
-    
-    var appServer: AUIRoomAppServer {
-        return (AUIRoomService.getInterface() as! AUIRoomServiceImpl).roomAppServer
     }
     
     func showListViewController(ani: Bool) {

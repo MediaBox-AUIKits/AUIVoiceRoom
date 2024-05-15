@@ -7,6 +7,11 @@
 
 import UIKit
 import AUIFoundation
+import AUIRoomCore
+
+public typealias AUIVoiceRoomVoiceChangerSelectedBlock = (_ mode: ARTCRoomVoiceChangerMode) -> Void
+public typealias AUIVoiceRoomVoiceReverbSelectedBlock = (_ mode: ARTCRoomVoiceReverbMode) -> Void
+
 
 open class AUIVoiceRoomMixerPanel: AVBaseControllPanel {
 
@@ -16,17 +21,26 @@ open class AUIVoiceRoomMixerPanel: AVBaseControllPanel {
         self.titleView.text = AUIVoiceRoomBundle.getString("调音台")
         
         self.contentView.addSubview(self.iemLabel)
-        self.contentView.addSubview(self.switchIEMBtn)
-        self.contentView.addSubview(self.mixEffectView)
-        self.contentView.addSubview(self.soundEffectView)
+        self.contentView.addSubview(self.switchEarBackBtn)
+        self.contentView.addSubview(self.voiceReverbView)
+        self.contentView.addSubview(self.voiceChangerView)
         
         self.iemLabel.frame = CGRect(x: 20, y: 18, width: 48, height: 18)
-        self.switchIEMBtn.center = CGPoint(x: self.iemLabel.av_right + 8 + self.switchIEMBtn.av_width / 2.0, y: self.iemLabel.av_centerY)
-        self.mixEffectView.frame = CGRect(x: 0, y: self.iemLabel.av_bottom + 24, width: self.contentView.av_width, height: 90)
-        self.soundEffectView.frame = CGRect(x: 0, y: self.mixEffectView.av_bottom + 24, width: self.contentView.av_width, height: 90)
+        self.switchEarBackBtn.center = CGPoint(x: self.iemLabel.av_right + 8 + self.switchEarBackBtn.av_width / 2.0, y: self.iemLabel.av_centerY)
+        self.voiceReverbView.frame = CGRect(x: 0, y: self.iemLabel.av_bottom + 24, width: self.contentView.av_width, height: 90)
+        self.voiceChangerView.frame = CGRect(x: 0, y: self.voiceReverbView.av_bottom + 24, width: self.contentView.av_width, height: 90)
         
-        self.mixEffectView.selectedItem = self.mixEffectView.itemList?.first
-        self.soundEffectView.selectedItem = self.soundEffectView.itemList?.first
+        self.voiceChangerView.onClickItem = { [weak self] item in
+            if let mode = ARTCRoomVoiceChangerMode(rawValue: item.id) {
+                self?.voiceChangerSelectedBlock?(mode)
+            }
+        }
+        
+        self.voiceReverbView.onClickItem = { [weak self] item in
+            if let mode = ARTCRoomVoiceReverbMode(rawValue: item.id) {
+                self?.voiceReverbSelectedBlock?(mode)
+            }
+        }
     }
 
     public required init?(coder: NSCoder) {
@@ -37,7 +51,7 @@ open class AUIVoiceRoomMixerPanel: AVBaseControllPanel {
         return 370
     }
     
-    public lazy var iemLabel: UILabel = {
+    open lazy var iemLabel: UILabel = {
         let label = UILabel()
         label.font = AVTheme.regularFont(12)
         label.textColor = AVTheme.text_strong
@@ -45,51 +59,86 @@ open class AUIVoiceRoomMixerPanel: AVBaseControllPanel {
         return label
     }()
     
-    public lazy var switchIEMBtn: UISwitch = {
+    open lazy var switchEarBackBtn: UISwitch = {
         let btn = UISwitch()
         btn.onTintColor = AVTheme.colourful_fg_strong
         btn.tintColor = AVTheme.fill_weak
+        btn.addTarget(self, action: #selector(onValueChanged), for: .valueChanged)
         return btn
     }()
     
-    public lazy var mixEffectView: AUIVoiceRoomMixerEffectView = {
+    open lazy var voiceReverbView: AUIVoiceRoomMixerEffectView = {
         let view = AUIVoiceRoomMixerEffectView()
         view.titleLabel.text = AUIVoiceRoomBundle.getString("混响")
         view.itemList = [
-            AUIVoiceRoomMixerEffectItem("0", "无", "ic_mix_empty"),
-            AUIVoiceRoomMixerEffectItem("1", "人声l", "ic_mix_1"),
-            AUIVoiceRoomMixerEffectItem("2", "人声ll", "ic_mix_2"),
-            AUIVoiceRoomMixerEffectItem("3", "澡堂", "ic_mix_3"),
-            AUIVoiceRoomMixerEffectItem("4", "明亮小房间", "ic_mix_4"),
-            AUIVoiceRoomMixerEffectItem("5", "黑暗小房间", "ic_mix_5"),
-            AUIVoiceRoomMixerEffectItem("6", "中等房间", "ic_mix_6"),
-            AUIVoiceRoomMixerEffectItem("7", "大房间", "ic_mix_7"),
-            AUIVoiceRoomMixerEffectItem("8", "教堂走廊", "ic_mix_8"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.Off.rawValue, "无", "ic_mix_empty"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.Vocal1.rawValue, "人声l", "ic_mix_1"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.Vocal2.rawValue, "人声ll", "ic_mix_2"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.BathRoom.rawValue, "澡堂", "ic_mix_3"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.SmallRoomBright.rawValue, "明亮小房间", "ic_mix_4"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.SmallRoomDark.rawValue, "黑暗小房间", "ic_mix_5"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.MediumRoom.rawValue, "中等房间", "ic_mix_6"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.LargeRoom.rawValue, "大房间", "ic_mix_7"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceReverbMode.ChurchHall.rawValue, "教堂走廊", "ic_mix_8"),
         ]
         return view
     }()
     
-    public lazy var soundEffectView: AUIVoiceRoomMixerEffectView = {
+    open lazy var voiceChangerView: AUIVoiceRoomMixerEffectView = {
         let view = AUIVoiceRoomMixerEffectView()
         view.titleLabel.text = AUIVoiceRoomBundle.getString("变声")
         view.itemList = [
-            AUIVoiceRoomMixerEffectItem("0", "无", "ic_sound_effect_empty"),
-            AUIVoiceRoomMixerEffectItem("1", "萝莉", "ic_sound_effect_1"),
-            AUIVoiceRoomMixerEffectItem("2", "大叔", "ic_sound_effect_2"),
-            AUIVoiceRoomMixerEffectItem("3", "回音", "ic_sound_effect_3"),
-            AUIVoiceRoomMixerEffectItem("4", "KTV", "ic_sound_effect_4"),
-            AUIVoiceRoomMixerEffectItem("5", "小黄人", "ic_sound_effect_5"),
-            AUIVoiceRoomMixerEffectItem("6", "机器人", "ic_sound_effect_6"),
-            AUIVoiceRoomMixerEffectItem("7", "大魔王", "ic_sound_effect_7"),
-            AUIVoiceRoomMixerEffectItem("8", "方言", "ic_sound_effect_8"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.Off.rawValue, "无", "ic_sound_effect_empty"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.BabyGirl.rawValue, "萝莉", "ic_sound_effect_1"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.OldMan.rawValue, "大叔", "ic_sound_effect_2"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.Echo.rawValue, "回音", "ic_sound_effect_3"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.KTV.rawValue, "KTV", "ic_sound_effect_4"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.BabyBoy.rawValue, "小黄人", "ic_sound_effect_5"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.Robot.rawValue, "机器人", "ic_sound_effect_6"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.Daimo.rawValue, "大魔王", "ic_sound_effect_7"),
+            AUIVoiceRoomMixerEffectItem(ARTCRoomVoiceChangerMode.Dialect.rawValue, "方言", "ic_sound_effect_8"),
         ]
         return view
     }()
+    
+    @objc func onValueChanged() {
+        self.switchEarBackBlock?(self.switchEarBackBtn.isOn)
+    }
+    
+    open func updateVoiceChangerMode(mode: ARTCRoomVoiceChangerMode) {
+        var selected: AUIVoiceRoomMixerEffectItem? = nil
+        self.voiceChangerView.itemList?.forEach({ item in
+            if item.id == mode.rawValue {
+                selected = item
+                return
+            }
+        })
+        self.voiceChangerView.selectedItem = selected
+    }
+    
+    open func updateVoiceReverbMode(mode: ARTCRoomVoiceReverbMode) {
+        var selected: AUIVoiceRoomMixerEffectItem? = nil
+        self.voiceReverbView.itemList?.forEach({ item in
+            if item.id == mode.rawValue {
+                selected = item
+                return
+            }
+        })
+        self.voiceReverbView.selectedItem = selected
+    }
+    
+    open func updateIsEarBack(on: Bool) {
+        self.switchEarBackBtn.isOn = on
+    }
+    
+    open var voiceChangerSelectedBlock: AUIVoiceRoomVoiceChangerSelectedBlock? = nil
+    open var voiceReverbSelectedBlock: AUIVoiceRoomVoiceReverbSelectedBlock? = nil
+    open var switchEarBackBlock: ((_ on: Bool)->Void)? = nil
 }
 
 open class AUIVoiceRoomMixerEffectItem: NSObject {
     
-    public init(_ id: String, _ titleKey: String, _ iconPath: String) {
+    public init(_ id: Int, _ titleKey: String, _ iconPath: String) {
         self.id = id
         self.title = AUIVoiceRoomBundle.getString(titleKey)
         self.icon = AUIVoiceRoomBundle.getImage(iconPath)
@@ -97,7 +146,7 @@ open class AUIVoiceRoomMixerEffectItem: NSObject {
         super.init()
     }
     
-    public let id:String
+    public let id: Int
     public let title: String?
     public let icon: UIImage?
     open var isSelected: Bool = false
@@ -129,17 +178,17 @@ open class AUIVoiceRoomMixerEffectView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public lazy var titleLabel: UILabel = {
+    open lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = AVTheme.regularFont(12)
         label.textColor = AVTheme.text_strong
         return label
     }()
     
-    public lazy var collectionView: UICollectionView = {
+    open lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        let view = UICollectionView(frame: CGRectZero, collectionViewLayout: layout)
+        let view = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
         view.backgroundColor = .clear
         view.delegate = self
         view.dataSource = self
@@ -160,6 +209,8 @@ open class AUIVoiceRoomMixerEffectView: UIView {
             self.collectionView.reloadData()
         }
     }
+    
+    open var onClickItem: ((_ item: AUIVoiceRoomMixerEffectItem) -> Void)? = nil
 }
 
 extension AUIVoiceRoomMixerEffectView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -192,6 +243,7 @@ extension AUIVoiceRoomMixerEffectView: UICollectionViewDataSource, UICollectionV
     
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.selectedItem = self.itemList?[indexPath.row]
+        self.onClickItem?(self.selectedItem!)
     }
 }
 
@@ -217,7 +269,7 @@ open class AUIVoiceRoomMixerEffectCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public lazy var titleLabel: UILabel = {
+    open lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = AVTheme.regularFont(10)
         label.textColor = AVTheme.text_strong
@@ -225,7 +277,7 @@ open class AUIVoiceRoomMixerEffectCell: UICollectionViewCell {
         return label
     }()
     
-    public lazy var iconView: UIImageView = {
+    open lazy var iconView: UIImageView = {
         let view = UIImageView()
         view.layer.cornerRadius = 6
         view.clipsToBounds = true

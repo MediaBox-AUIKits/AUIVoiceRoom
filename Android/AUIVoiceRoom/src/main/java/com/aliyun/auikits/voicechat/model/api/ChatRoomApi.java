@@ -1,5 +1,6 @@
 package com.aliyun.auikits.voicechat.model.api;
 
+import com.aliyun.auikits.biz.voiceroom.VoiceRoomServerConstant;
 import com.aliyun.auikits.voicechat.model.entity.network.CloseRoomResponse;
 import com.aliyun.auikits.voicechat.model.entity.network.LoginRequest;
 import com.aliyun.auikits.voicechat.model.entity.network.LoginResponse;
@@ -21,17 +22,15 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface ChatRoomApi {
-    public static final String APP_ID = "xxx";
-    public static final String HOST = "xxx";
-    public static final String RTC_GLSB = "https://gw.rtn.aliyuncs.com";
+    public static final String HOST = VoiceRoomServerConstant.HOST;
 
-    @POST("/login")
+    @POST(VoiceRoomServerConstant.LOGIN_URL)
     Observable<LoginResponse> login(
             @Body
             LoginRequest request
     );
 
-    @POST("/api/chatroom/token")
+    @POST(VoiceRoomServerConstant.GET_IM_TOKEN_URL)
     Observable<ImTokenResponse> getImToken(
             @Header("Authorization")
             String authorization,
@@ -39,7 +38,7 @@ public interface ChatRoomApi {
             ImTokenRequest request
     );
 
-    @POST("/api/chatroom/getRtcAuthToken")
+    @POST(VoiceRoomServerConstant.GET_RTC_TOKEN_URL)
     Observable<RtcTokenResponse> getRtcToken(
             @Header("Authorization")
             String authorization,
@@ -47,22 +46,22 @@ public interface ChatRoomApi {
             RtcTokenRequest request
     );
 
-    @POST("/api/chatroom/list")
+    @POST(VoiceRoomServerConstant.GET_CHAT_ROOM_LIST_URL)
     Observable<ChatRoomListResponse> fetchRoomList(
             @Header("Authorization")
             String authorization,
             @Body ChatRoomListRequest request);
 
-    @POST("/api/chatroom/get")
+    @POST(VoiceRoomServerConstant.GET_CHAT_ROOM_INFO_URL)
     Observable<ChatRoomResponse> getRoomInfo(
             @Header("Authorization") String authorization,
             @Body ChatRoomRequest request
     );
 
-    @POST("/api/chatroom/dismiss")
+    @POST(VoiceRoomServerConstant.DISMISS_CHAT_ROOM_URL)
     Observable<CloseRoomResponse> dismissRoom(@Header("Authorization") String authorization, @Body CloseRoomRequest request);
 
-    @POST("/api/chatroom/create")
+    @POST(VoiceRoomServerConstant.CREATE_CHAT_ROOM_URL)
     Observable<CreateRoomResponse> createRoom(@Header("Authorization") String authorization, @Body CreateRoomRequest request);
 
 }

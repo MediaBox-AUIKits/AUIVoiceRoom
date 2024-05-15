@@ -55,11 +55,11 @@ open class AUIVoiceRoomSpeakingAnimationView: UIView {
         self.isAnimation = true
         let time = 0.3
         let scale = 1.25
-        self.firstView.transform = CGAffineTransformIdentity
+        self.firstView.transform = CGAffineTransform.identity
         UIView.animate(withDuration: time, delay: 0, options: .repeat) {
             self.firstView.transform = CGAffineTransform(scaleX: scale, y: scale)
         }
-        self.secondView.transform = CGAffineTransformIdentity
+        self.secondView.transform = CGAffineTransform.identity
         UIView.animate(withDuration: time, delay: time / 2.0, options: .repeat) {
             self.secondView.transform = CGAffineTransform(scaleX: scale, y: scale)
         }
@@ -69,7 +69,7 @@ open class AUIVoiceRoomSpeakingAnimationView: UIView {
         self.isAnimation = false
         self.firstView.layer.removeAllAnimations()
         self.secondView.layer.removeAllAnimations()
-        self.firstView.transform = CGAffineTransformIdentity
-        self.secondView.transform = CGAffineTransformIdentity
+        self.firstView.transform = CGAffineTransform.identity
+        self.secondView.transform = CGAffineTransform.identity
     }
 }

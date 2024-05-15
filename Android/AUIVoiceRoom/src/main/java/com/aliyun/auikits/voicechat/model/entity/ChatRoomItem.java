@@ -1,6 +1,8 @@
 package com.aliyun.auikits.voicechat.model.entity;
 
 
+import com.aliyun.auikits.voiceroom.bean.UserInfo;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -61,5 +63,12 @@ public class ChatRoomItem implements Serializable {
 
     public void setCompere(ChatMember compere) {
         this.compere = compere;
+    }
+
+    public UserInfo getCompereUserInfo() {
+        UserInfo userInfo = new UserInfo(compere.getId(), "");
+        userInfo.userName = compere.getName();
+        userInfo.avatarUrl = compere.getAvatar();
+        return userInfo;
     }
 }

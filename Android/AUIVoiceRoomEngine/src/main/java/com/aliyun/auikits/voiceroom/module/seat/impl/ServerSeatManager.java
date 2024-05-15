@@ -1,14 +1,17 @@
 package com.aliyun.auikits.voiceroom.module.seat.impl;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 
-import com.aliyun.auikits.voiceroom.bean.RoomInfo;
+import com.aliyun.auikits.biz.ktv.KTVServerConstant;
+import com.aliyun.auikits.biz.voiceroom.VoiceRoomServerConstant;
+import com.aliyun.auikits.rtc.ClientMode;
+import com.aliyun.auikits.single.server.Server;
+import com.aliyun.auikits.single.Single;
+import com.aliyun.auikits.single.Singleton;
+import com.aliyun.auikits.common.util.CommonUtil;
 import com.aliyun.auikits.voiceroom.module.seat.SeatInfo;
 import com.aliyun.auikits.voiceroom.callback.ActionCallback;
 import com.aliyun.auikits.voiceroom.module.seat.SeatManager;
-import com.aliyun.auikits.voiceroom.module.seat.callback.SeatManagerCallback;
 import com.aliyun.auikits.voiceroom.module.seat.protocol.Params;
 import com.aliyun.auikits.voiceroom.network.HttpRequest;
 
@@ -19,33 +22,30 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class ServerSeatManager implements SeatManager {
+public class ServerSeatManager implements SeatManager, Single {
 
-    private SeatManagerCallback mCallback;
-    private static final String HOST = "http://chatroom.h5video.vip";
-    private static final String JOIN_SEAT_URL = HOST + "/api/chatroom/joinMic";
-    private static final String LEAVE_SEAT_URL = HOST + "/api/chatroom/leaveMic";
-    private static final String GET_SEAT_LIST_URL = HOST + "/api/chatroom/getMeetingInfo";
     private String mToken;
 
-    private Handler mUIHandler = new Handler(Looper.getMainLooper());
     private Map<String, String> mHeaders;
 
-    public ServerSeatManager(String serverToken, SeatManagerCallback callback){
-        this.mCallback = callback;
-        this.mToken = serverToken;
+    private ClientMode mMode;
+
+    public ServerSeatManager(){
+        this.mToken = Singleton.getInstance(Server.class).getAuthorizeToken();
+        if(TextUtils.isEmpty(this.mToken))
+            throw new IllegalStateException("you should config the server token first!");
         this.mHeaders = new Hashtable<>();
         mHeaders.put("Authorization", mToken);
+    }
+
+    public void setClientMode(ClientMode mode){
+        this.mMode = mode;
     }
 
     @Override
@@ -61,15 +61,14 @@ public class ServerSeatManager implements SeatManager {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpRequest.getInstance().post(JOIN_SEAT_URL, mHeaders, jsonObj, new Callback() {
+        String url = VoiceRoomServerConstant.JOIN_SEAT_URL;
+        if(mMode == ClientMode.KTV){
+            url = KTVServerConstant.JOIN_SEAT_URL;
+        }
+        HttpRequest.getInstance().post(url, mHeaders, jsonObj, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                mUIHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onFailureCallback(-1, "join seat failed except: " + e.getMessage(), callback);
-                    }
-                });
+                onFailureCallback(-1, "join seat failed except: " + e.getMessage(), callback);
             }
 
             @Override
@@ -81,12 +80,7 @@ public class ServerSeatManager implements SeatManager {
                         JSONObject resp = new JSONObject(response.body().string());
                         int code = resp.optInt(Params.KEY_CODE);
                         if(code != 200){
-                            mUIHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mCallback.onResponseJoinSeat(null);
-                                }
-                            });
+                            CommonUtil.actionCallback(callback, -1, String.format("http request failed code[%d]", code), null);
                             return;
                         }
 
@@ -103,18 +97,14 @@ public class ServerSeatManager implements SeatManager {
                             }
                         }
                         final JSONObject finalTarget = target;
-                        mUIHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mCallback.onResponseJoinSeat(finalTarget);
-                            }
-                        });
+                        Map<String, Object> params = new Hashtable<>();
+                        params.put(Params.KEY_RESPONSE, finalTarget);
+                        CommonUtil.actionCallback(callback, 0, null, params);
                     } catch (JSONException | IOException e) {
                         e.printStackTrace();
-                        onFailureCallback(-1, "join seat failed except: " + e.getMessage(), callback);
+                        onFailureCallback(-2, "join seat failed except: " + e.getMessage(), callback);
                         return;
                     }
-                    onSuccessCallback(callback);
                 }
             }
         });
@@ -123,25 +113,7 @@ public class ServerSeatManager implements SeatManager {
     private void onFailureCallback(int code, String msg, ActionCallback callback){
         if(callback == null)
             return;
-        mUIHandler.post(new Runnable() {
-            @Override
-            public void run() {
-
-                callback.onResult(code, msg, null);
-            }
-        });
-    }
-
-    private void onSuccessCallback(ActionCallback callback){
-        if(callback == null)
-            return;
-        mUIHandler.post(new Runnable() {
-            @Override
-            public void run() {
-
-                callback.onResult(0, "", null);
-            }
-        });
+        CommonUtil.actionCallback(callback, code, msg, null);
     }
 
     @Override
@@ -156,8 +128,11 @@ public class ServerSeatManager implements SeatManager {
             onFailureCallback(-1, "json except: " + e.getMessage(), null);
             return;
         }
-
-        HttpRequest.getInstance().post(LEAVE_SEAT_URL, mHeaders, reqObj, new Callback() {
+        String url = VoiceRoomServerConstant.LEAVE_SEAT_URL;
+        if(mMode == ClientMode.KTV){
+            url = KTVServerConstant.LEAVE_SEAT_URL;
+        }
+        HttpRequest.getInstance().post(url, mHeaders, reqObj, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 onFailureCallback(-1, "http except: " + e.getMessage(), null);
@@ -170,29 +145,30 @@ public class ServerSeatManager implements SeatManager {
                 }else{
                     try {
                         JSONObject resp = new JSONObject(response.body().string());
-                        mUIHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mCallback.onResponseLeaveSeat(resp);
-                            }
-                        });
+                        Map<String, Object> params = new Hashtable<>();
+                        int code = resp.optInt(Params.KEY_CODE);
+                        params.put(Params.KEY_CODE, code);
+                        CommonUtil.actionCallback(callback, 0, null, params);
                     } catch (JSONException | IOException e) {
                         e.printStackTrace();
                         onFailureCallback(-1, "json except: " + e.getMessage(), null);
                         return;
                     }
-                    onSuccessCallback(callback);
                 }
             }
         });
     }
 
     @Override
-    public void getSeatList(RoomInfo roomInfo, ActionCallback callback) {
+    public void getSeatList(String roomId, ActionCallback callback) {
         JSONObject reqObj = new JSONObject();
         try {
-            reqObj.put(Params.KEY_ID, roomInfo.roomId);
-            HttpRequest.getInstance().post(GET_SEAT_LIST_URL, mHeaders, reqObj, new Callback() {
+            reqObj.put(Params.KEY_ID, roomId);
+            String url = VoiceRoomServerConstant.GET_SEAT_LIST_URL;
+            if(mMode == ClientMode.KTV){
+                url = KTVServerConstant.GET_SEAT_LIST_URL;
+            }
+            HttpRequest.getInstance().post(url, mHeaders, reqObj, new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     onFailureCallback(-1, "http except: " + e.getMessage(), null);
@@ -206,22 +182,16 @@ public class ServerSeatManager implements SeatManager {
                         try {
                             JSONObject resp = new JSONObject(response.body().string());
                             int code = resp.optInt(Params.KEY_CODE);
-                            mUIHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(code != 200){
-                                        mCallback.onResponseQuerySeatList(null);
-                                    }else{
-                                        mCallback.onResponseQuerySeatList(resp);
-                                    }
-                                }
-                            });
+                            Map<String, Object> params = new Hashtable<>();
+                            if(code == 200){
+                                params.put(Params.KEY_RESPONSE, resp);
+                            }
+                            CommonUtil.actionCallback(callback, 0, null, params);
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
                             onFailureCallback(-1, "json except: " + e.getMessage(), null);
                             return;
                         }
-                        onSuccessCallback(callback);
                     }
                 }
             });

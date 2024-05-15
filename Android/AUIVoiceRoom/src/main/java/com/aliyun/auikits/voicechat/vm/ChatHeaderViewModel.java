@@ -3,24 +3,39 @@ package com.aliyun.auikits.voicechat.vm;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModel;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.aliyun.auikits.voicechat.R;
+import com.aliyun.auikits.voicechat.adapter.ChatItemDecoration;
+import com.aliyun.auikits.voicechat.base.card.CardListAdapter;
+import com.aliyun.auikits.voicechat.base.feed.ContentViewModel;
+import com.aliyun.auikits.voicechat.databinding.VoicechatDialogChatMemberListBinding;
+import com.aliyun.auikits.voicechat.model.content.ChatMemberListContentModel;
 import com.aliyun.auikits.voicechat.model.entity.ChatMember;
 import com.aliyun.auikits.voicechat.model.entity.ChatRoom;
 import com.aliyun.auikits.voicechat.model.entity.ChatRoomCallback;
 import com.aliyun.auikits.voicechat.util.DisplayUtil;
 import com.aliyun.auikits.voicechat.util.ToastHelper;
+import com.aliyun.auikits.voicechat.widget.card.CardTypeDef;
+import com.aliyun.auikits.voicechat.widget.card.ChatMemberListCard;
+import com.aliyun.auikits.voicechat.widget.card.DefaultCardViewFactory;
 import com.aliyun.auikits.voicechat.widget.helper.DialogHelper;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoomCallback;
+import com.aliyun.auikits.voicechat.widget.list.CustomViewHolder;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngineDelegate;
 import com.aliyun.auikits.voiceroom.bean.NetworkState;
 import com.aliyun.auikits.voiceroom.bean.UserInfo;
+import com.orhanobut.dialogplus.DialogPlus;
 
 
 public class ChatHeaderViewModel extends ViewModel {
@@ -33,11 +48,11 @@ public class ChatHeaderViewModel extends ViewModel {
     public ObservableField<String> compereAvatar = new ObservableField<String>();
     //当前用户是否主持人
     private boolean isCompere = false;
-    private AUIVoiceRoomCallback roomCallback;
-    private AUIVoiceRoom roomController;
+    private ARTCVoiceRoomEngineDelegate roomCallback;
+    private ARTCVoiceRoomEngine roomController;
     private ChatRoom chatRoom;
 
-    public void bind(ChatRoom aChatRoom, AUIVoiceRoom roomController) {
+    public void bind(ChatRoom aChatRoom, ARTCVoiceRoomEngine roomController) {
         this.roomController = roomController;
         this.chatRoom = aChatRoom;
         this.id.set(chatRoom.getId());
@@ -52,32 +67,35 @@ public class ChatHeaderViewModel extends ViewModel {
         }
         isCompere = chatRoom.isCompere();
         this.roomCallback = new ChatRoomCallback() {
-            @Override
-            public void onUserOnline(UserInfo userInfo) {
-                chatRoom.setMemberNum(chatRoom.getMemberNum() + 1);
-                updateRoomMember();
-            }
 
             @Override
-            public void onUserOffline(UserInfo userInfo) {
+            public void onLeavedRoom(UserInfo userInfo) {
                 chatRoom.setMemberNum(chatRoom.getMemberNum() - 1);
                 updateRoomMember();
             }
 
             @Override
-            public void onUserNetworkState(UserInfo user) {
+            public void onMemberCountChanged(int count) {
+                super.onMemberCountChanged(count);
+                chatRoom.setMemberNum(count);
+                updateRoomMember();
+            }
+
+            @Override
+            public void onNetworkStateChanged(UserInfo user) {
                 //如果收到自己的网络变化通知，则更新状态
                 if(user.userId.equals(ChatHeaderViewModel.this.chatRoom.getSelf().getId())) {
                     updateNetworkStatus(user.networkState);
                 }
             }
         };
-        this.roomController.addRoomCallback(this.roomCallback);
-
+        this.roomController.addObserver(this.roomCallback);
+        chatRoom.setMemberNum(roomController.getMemberCount());
+        updateRoomMember();
     }
 
     public void unBind() {
-        this.roomController.removeRoomCallback(this.roomCallback);
+        this.roomController.removeObserver(this.roomCallback);
     }
 
     public void updateNetworkStatus(NetworkState networkStatus) {
@@ -120,39 +138,6 @@ public class ChatHeaderViewModel extends ViewModel {
     }
 
     public void onMemberListClick(View view) {
-        //暂时屏蔽
-        return;
-
-//        Context context = view.getContext();
-//
-//        VoicechatDialogChatMemberListBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.voicechat_dialog_chat_member_list, null, false);
-//        binding.setLifecycleOwner((LifecycleOwner) context);
-//        CustomViewHolder viewHolder = new CustomViewHolder(binding.getRoot());
-//        DefaultCardViewFactory factory = new DefaultCardViewFactory();
-//        factory.registerCardView(CardTypeDef.CHAT_MEMBER_CARD, ChatMemberListCard.class);
-//        CardListAdapter cardListAdapter = new CardListAdapter(factory);
-//
-//        binding.rvChatMemberList.setLayoutManager(new LinearLayoutManager(context));
-//        binding.rvChatMemberList.addItemDecoration(new ChatItemDecoration(0, 0));
-//        binding.rvChatMemberList.setAdapter(cardListAdapter);
-//
-//        ContentViewModel contentViewModel = new ContentViewModel.Builder()
-//                .setContentModel(new ChatMemberListContentModel())
-//                .setLoadMoreEnable(true)
-//                .setLoadingView(R.layout.voicechat_loading_view)
-//                .setErrorView(R.layout.voicechat_layout_error_view, R.id.btn_retry)
-//                .build();
-//        contentViewModel.bindView(cardListAdapter);
-//
-//
-//        DialogPlus dialog = DialogPlus.newDialog(context)
-//                .setContentHolder(viewHolder)
-//                .setGravity(Gravity.BOTTOM)
-//                .setExpanded(false)
-//                .setPadding(0, 0 ,0 , DisplayUtil.getNavigationBarHeight(context))
-//                .setOverlayBackgroundResource(android.R.color.transparent)
-//                .create();
-//        dialog.show();
     }
 
     public void onRoomCloseClick(View view) {

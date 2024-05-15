@@ -29,7 +29,7 @@ AUI Kits 语聊房场景集成工具是阿里云提供的跨平台音视频实�
 - 准备 iOS 10.0 及以上版本的真机
 
 ### 前提条件
-需要开通应用，并且在你的服务端上开发相关接口或直接部署提供的Server源码，详情参考官网文档[前置准备]
+需要开通应用，并且在你的服务端上开发相关接口或直接部署提供的Server源码，详情参考官网文档[前置准备](https://help.aliyun.com/zh/apsara-video-sdk/use-cases/pre-preparation)
 
 
 ## 跑通demo
@@ -74,7 +74,7 @@ platform :ios, '10.0'
 
 target '你的App target' do
     # 根据自己的业务场景，集成合适的音视频终端SDK，支持：AliVCSDK_ARTC、AliVCSDK_Standard、AliVCSDK_InteractiveLive
-    pod 'AliVCSDK_ARTC', '~> 6.8.0'
+    pod 'AliVCSDK_ARTC', '~> 6.10.0'
 
     # 基础UI组件
     pod 'AUIFoundation', :path => "./AUIVoiceRoom/AUIBaseKits/AUIFoundation/"
@@ -98,15 +98,15 @@ end
 
 
 ### 源码配置
-- 完成前提条件后，进入文件AUIRoomService.swift，修改服务端域名
+- 完成前提条件后，进入文件AUIVoiceRoomManager.swift，修改服务端域名
 ```swift
-// AUIRoomService.swift
-let AppServerDomain = "你的应用服务器域名"
+// AUIVoiceRoomManager.swift
+let VoiceRoomServerDomain = "你的应用服务器域名"
 ```
-- 完成前提条件后，进入文件AUIRoomCommon.swift，修改互动直播应用appID
+- 完成前提条件后，进入文件ARTCRoomRTCService.swift，修改互动直播应用appID
 ```swift
-// AUIRoomCommon.swift
-@objcMembers public class AUIRoomConfig: NSObject {
+// ARTCRoomRTCService.swift
+@objcMembers public class ARTCRoomConfig: NSObject {
     
     public var appId = "你的appID"
     ...
@@ -116,11 +116,12 @@ let AppServerDomain = "你的应用服务器域名"
 前面工作完成后，接下来可以根据自身的业务场景和交互，可以在你APP其他模块或主页上通过组件接口快速实现语聊房功能，也可以根据自身的需求修改源码。
 
 ``` Swift
-// 进入语聊房前（需确保已经App登录），需要设置当前登录用户信息
-let user = AUIRoomUser(uid)
+// 初始化，进入语聊房前（需确保已经App登录）
+let user = ARTCRoomUser(uid) // 当前登录用户信息
 user.userNick = nick
 user.userAvatar = avatar
-AUIVoiceRoomManager.shared.setCurrentUser(user)
+let serverAuth = auth  // app登录后的token，用于服务端安全校验
+AUIVoiceRoomManager.shared.setup(currentUser: user!, serverAuth: serverAuth)
 
 
 // 打开语聊房间列表

@@ -14,11 +14,13 @@ public class ChatMusicCardViewModel extends ViewModel {
     public ObservableField<String> title = new ObservableField<String>("");
     public ObservableField<String> author = new ObservableField<String>("0");
     public ObservableBoolean playing = new ObservableBoolean(false);
+    public ObservableBoolean applying = new ObservableBoolean(false);
 
     public void bind(ChatMusicItem musicItem) {
         this.title.set(musicItem.getTitle());
         this.author.set(musicItem.getAuthor());
         this.playing.set(musicItem.isPlaying());
+        this.applying.set(musicItem.isApplying());
     }
 
 

@@ -12,4 +12,6 @@ public class Params {
     public static final String KEY_USER_NICK = "user_nick";
     public static final String KEY_USER_AVATAR = "user_avatar";
     public static final String KEY_REASON = "reason";
+    public static final String KEY_RESPONSE = "key_response";
+    public static final String KEY_SEAT_INDEX = "seatIndex";
 }

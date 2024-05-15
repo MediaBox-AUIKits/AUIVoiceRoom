@@ -1,7 +1,5 @@
 package com.aliyun.auikits.voicechat.model.content;
 
-import androidx.annotation.NonNull;
-
 import com.aliyun.auikits.voicechat.base.card.CardEntity;
 import com.aliyun.auikits.voicechat.base.feed.AbsContentModel;
 import com.aliyun.auikits.voicechat.base.feed.BizParameter;
@@ -9,8 +7,8 @@ import com.aliyun.auikits.voicechat.base.feed.IBizCallback;
 import com.aliyun.auikits.voicechat.model.entity.ChatMember;
 import com.aliyun.auikits.voicechat.model.entity.ChatRoomCallback;
 import com.aliyun.auikits.voicechat.widget.card.CardTypeDef;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoomCallback;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngineDelegate;
 import com.aliyun.auikits.voiceroom.bean.UserInfo;
 import com.aliyun.auikits.voiceroom.callback.ActionCallback;
 
@@ -23,12 +21,12 @@ import java.util.Objects;
 public class ChatMicMemberContentModel extends AbsContentModel<CardEntity> {
     public static final int MAX_MEMBER_COUNT = 8;
     private ChatMember self = null;
-    private AUIVoiceRoom roomController = null;
-    private AUIVoiceRoomCallback roomCallback;
+    private ARTCVoiceRoomEngine roomController = null;
+    private ARTCVoiceRoomEngineDelegate roomCallback;
     private List<CardEntity> roomMemberList = new ArrayList<>();
     private int lastSpeakingPos = -1;
 
-    public ChatMicMemberContentModel(ChatMember self, AUIVoiceRoom roomController) {
+    public ChatMicMemberContentModel(ChatMember self, ARTCVoiceRoomEngine roomController) {
         this.self = self;
 
         for(int i = 1; i <= MAX_MEMBER_COUNT; i++) {
@@ -43,7 +41,7 @@ public class ChatMicMemberContentModel extends AbsContentModel<CardEntity> {
 
         this.roomCallback = new ChatRoomCallback() {
             @Override
-            public void onUserJoinMic(UserInfo user) {
+            public void onJoinedMic(UserInfo user) {
                 if(user.micPosition > 0 && user.micPosition <= MAX_MEMBER_COUNT) {
                     CardEntity cardEntity = roomMemberList.get(user.micPosition-1);
                     cardEntity.cardType = CardTypeDef.CHAT_MEMBER_CARD;
@@ -58,7 +56,7 @@ public class ChatMicMemberContentModel extends AbsContentModel<CardEntity> {
             }
 
             @Override
-            public void onUserLeaveMic(UserInfo user) {
+            public void onLeavedMic(UserInfo user) {
                 if(user.micPosition > 0 && user.micPosition <= MAX_MEMBER_COUNT) {
                     CardEntity cardEntity = roomMemberList.get(user.micPosition-1);
                     cardEntity.cardType = CardTypeDef.CHAT_MEMBER_EMPTY_CARD;
@@ -70,36 +68,35 @@ public class ChatMicMemberContentModel extends AbsContentModel<CardEntity> {
             }
 
             @Override
-            public void onUserMicOn(UserInfo user) {
-                if(user.micPosition > 0 && user.micPosition <= MAX_MEMBER_COUNT) {
-                    CardEntity cardEntity = roomMemberList.get(user.micPosition-1);
-                    if(Objects.equals(cardEntity.cardType, CardTypeDef.CHAT_MEMBER_CARD)) {
-                        ChatMember chatMember = (ChatMember) cardEntity.bizData;
-                        if(user.userId.equals(chatMember.getId())) {
-                            chatMember.setMicrophoneStatus(ChatMember.MICROPHONE_STATUS_ON);
-                            updateContent(cardEntity, user.micPosition-1);
+            public void onMicUserMicrophoneChanged(UserInfo user, boolean open) {
+                if(open){
+                    if(user.micPosition > 0 && user.micPosition <= MAX_MEMBER_COUNT) {
+                        CardEntity cardEntity = roomMemberList.get(user.micPosition-1);
+                        if(Objects.equals(cardEntity.cardType, CardTypeDef.CHAT_MEMBER_CARD)) {
+                            ChatMember chatMember = (ChatMember) cardEntity.bizData;
+                            if(user.userId.equals(chatMember.getId())) {
+                                chatMember.setMicrophoneStatus(ChatMember.MICROPHONE_STATUS_ON);
+                                updateContent(cardEntity, user.micPosition-1);
+                            }
+                        }
+
+                    }
+                }else{
+                    if(user.micPosition > 0 && user.micPosition <= MAX_MEMBER_COUNT) {
+                        CardEntity cardEntity = roomMemberList.get(user.micPosition-1);
+                        if(Objects.equals(cardEntity.cardType, CardTypeDef.CHAT_MEMBER_CARD)) {
+                            ChatMember chatMember = (ChatMember) cardEntity.bizData;
+                            if(user.userId.equals(chatMember.getId())) {
+                                chatMember.setMicrophoneStatus(ChatMember.MICROPHONE_STATUS_OFF);
+                                updateContent(cardEntity, user.micPosition-1);
+                            }
                         }
                     }
-
                 }
             }
 
             @Override
-            public void onUserMicOff(UserInfo user) {
-                if(user.micPosition > 0 && user.micPosition <= MAX_MEMBER_COUNT) {
-                    CardEntity cardEntity = roomMemberList.get(user.micPosition-1);
-                    if(Objects.equals(cardEntity.cardType, CardTypeDef.CHAT_MEMBER_CARD)) {
-                        ChatMember chatMember = (ChatMember) cardEntity.bizData;
-                        if(user.userId.equals(chatMember.getId())) {
-                            chatMember.setMicrophoneStatus(ChatMember.MICROPHONE_STATUS_OFF);
-                            updateContent(cardEntity, user.micPosition-1);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onUserSpeakState(UserInfo user) {
+            public void onMicUserSpeakStateChanged(UserInfo user) {
                 //有人在讲话，且和上次讲话的用户不是同一个,则把上次讲话的状态设置成false
                 if(user.speaking && lastSpeakingPos > 0 && lastSpeakingPos != user.micPosition) {
                     CardEntity cardEntity = roomMemberList.get(lastSpeakingPos-1);
@@ -141,7 +138,7 @@ public class ChatMicMemberContentModel extends AbsContentModel<CardEntity> {
             }
 
             @Override
-            public void onUserNetworkState(UserInfo user) {
+            public void onNetworkStateChanged(UserInfo user) {
                 if(user.micPosition > 0 && user.micPosition <= MAX_MEMBER_COUNT) {
                     CardEntity cardEntity = roomMemberList.get(user.micPosition-1);
                     if(Objects.equals(cardEntity.cardType, CardTypeDef.CHAT_MEMBER_CARD)) {
@@ -172,12 +169,12 @@ public class ChatMicMemberContentModel extends AbsContentModel<CardEntity> {
             }
         };
         this.roomController = roomController;
-        this.roomController.addRoomCallback(this.roomCallback);
+        this.roomController.addObserver(this.roomCallback);
 
     }
 
     public void release() {
-        this.roomController.removeRoomCallback(this.roomCallback);
+        this.roomController.removeObserver(this.roomCallback);
     }
 
 

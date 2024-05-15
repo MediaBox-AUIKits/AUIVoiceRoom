@@ -21,9 +21,9 @@ open class AUIVoiceRoomTakeMicPanel: AVBaseControllPanel {
         
         let width = (self.av_width - 20 * 2 - 15) / 2.0
         let top = self.av_height - UIView.av_safeBottom - 16 - 38
-        self.cancelBtn.frame = CGRectMake(20, top, width, 38)
-        self.okBtn.frame = CGRectMake(self.cancelBtn.av_right + 15, top, width, 38)
-        self.muteBtn.frame = CGRectMake(self.av_width / 2.0 - 30, 50, 60, 60)
+        self.cancelBtn.frame = CGRect(x: 20, y: top, width: width, height: 38)
+        self.okBtn.frame = CGRect(x: self.cancelBtn.av_right + 15, y: top, width: width, height: 38)
+        self.muteBtn.frame = CGRect(x: self.av_width / 2.0 - 30, y: 50, width: 60, height: 60)
     }
 
     public required init?(coder: NSCoder) {

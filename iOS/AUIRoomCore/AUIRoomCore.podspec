@@ -31,13 +31,41 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '10.0'
   s.static_framework = true
   s.swift_version = '5.0'
-  s.default_subspecs='Core'
-  s.pod_target_xcconfig = {'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) COCOAPODS=1'}
-
-  s.subspec 'Core' do |ss|
-    ss.resource = 'Resources/*.bundle'
-    ss.source_files = 'Source/**/*.{swift,h,m,mm}'
+  s.default_subspecs='Service'
+  
+  s.subspec 'Service' do |ss|
+    ss.source_files = 'Source/Core/{Model,Service}/**/*.{swift,h,m,mm}'
+  end
+  
+  s.subspec 'VoiceRoomCore' do |ss|
+    ss.dependency 'AUIRoomCore/Service'
+    ss.source_files = 'Source/Core/VoiceRoom/**/*.{swift,h,m,mm}'
+  end
+  
+  s.subspec 'KaraokeRoomCore' do |ss|
+    ss.dependency 'AUIRoomCore/VoiceRoomCore'
+    ss.source_files = 'Source/Core/KaraokeRoom/**/*.{swift,h,m,mm}'
+  end
+  
+  s.subspec 'VoiceRoomAPI' do |ss|
+    ss.dependency 'AUIRoomCore/VoiceRoomCore'
     ss.dependency 'AUIMessage'
+    ss.source_files = 'Source/Imp/*.{swift,h,m,mm}', 'Source/Imp/VoiceRoom/**/*.{swift,h,m,mm}', 'Source/Login/**/*.{swift,h,m,mm}'
+    ss.pod_target_xcconfig = {'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'ARTC_VOICE_ROOM'}
+  end
+  
+  s.subspec 'KaraokeRoomAPI' do |ss|
+    ss.dependency 'AUIRoomCore/KaraokeRoomCore'
+    ss.dependency 'AUIRoomCore/VoiceRoomAPI'
+    ss.source_files = 'Source/Imp/KaraokeRoom/**/*.{swift,h,m,mm}'
+    ss.pod_target_xcconfig = {'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'ARTC_KARAOKE_ROOM'}
+  end
+  
+  s.subspec 'API' do |ss|
+    ss.dependency 'AUIRoomCore/Service'
+    ss.dependency 'AUIMessage'
+    ss.source_files = 'Source/Imp/**/*.{swift,h,m,mm}', 'Source/Core/{VoiceRoom,KaraokeRoom}/**/*.{swift,h,m,mm}', 'Source/Login/**/*.{swift,h,m,mm}'
+    ss.pod_target_xcconfig = {'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'ARTC_KARAOKE_ROOM ARTC_VOICE_ROOM'}
   end
   
   s.subspec 'AliVCSDK_ARTC' do |ss|

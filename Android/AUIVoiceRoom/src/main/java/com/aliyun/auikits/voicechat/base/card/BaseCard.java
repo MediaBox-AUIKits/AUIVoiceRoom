@@ -5,9 +5,12 @@ import android.widget.LinearLayout;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+
 public abstract class BaseCard extends LinearLayout {
     protected CardEntity entity;
     protected String cardType;
+    protected ARTCVoiceRoomEngine mEngine;
 
     public BaseCard(Context context) {
         super(context);
@@ -15,6 +18,10 @@ public abstract class BaseCard extends LinearLayout {
     }
 
     public abstract void onCreate(Context context);
+
+    public void bindEngine(ARTCVoiceRoomEngine engine){
+        this.mEngine = engine;
+    }
 
     public void onBind(CardEntity entity) {
         this.entity = entity;

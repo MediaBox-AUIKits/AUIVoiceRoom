@@ -6,35 +6,24 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 
 import com.aliyun.auikits.voicechat.R;
 import com.aliyun.auikits.voicechat.databinding.VoicechatDialogExitBinding;
 import com.aliyun.auikits.voicechat.ChatActivity;
-import com.aliyun.auikits.voicechat.ChatEntryActivity;
 import com.aliyun.auikits.voicechat.base.network.RetrofitManager;
 import com.aliyun.auikits.voicechat.model.api.ChatRoomApi;
-import com.aliyun.auikits.voicechat.model.entity.network.BaseResponse;
 import com.aliyun.auikits.voicechat.model.entity.network.CloseRoomRequest;
 import com.aliyun.auikits.voicechat.model.entity.network.CloseRoomResponse;
 import com.aliyun.auikits.voicechat.service.ChatRoomManager;
-import com.aliyun.auikits.voicechat.model.entity.ChatRoomCallback;
 import com.aliyun.auikits.voicechat.service.ChatRoomService;
-import com.aliyun.auikits.voicechat.util.ToastHelper;
 import com.aliyun.auikits.voicechat.widget.list.CustomViewHolder;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
-import com.aliyun.auikits.voiceroom.callback.ActionCallback;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
 import com.orhanobut.dialogplus.DialogPlus;
 
-import java.util.Map;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.functions.Function;
@@ -42,7 +31,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class DialogHelper {
 
-    public static void showCloseDialog(Context context, AUIVoiceRoom roomController, boolean isCompere) {
+    public static void showCloseDialog(Context context, ARTCVoiceRoomEngine roomController, boolean isCompere) {
         if(context instanceof Activity) {
 
             VoicechatDialogExitBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.voicechat_dialog_exit, null, false);

@@ -136,7 +136,8 @@ import AUIRoomCore
         
         self.roomController.joinRoom { [weak self] error in
             if let error = error {
-                AVAlertController.show(withTitle: "进入房间失败，请稍后重试~", message: error.auiMessage, needCancel: false) { cancel in
+                AVAlertController.show(withTitle: "进入房间失败，请稍后重试~", message: error.artcMessage, needCancel: false) { cancel in
+                    self?.roomController.leaveRoom()
                     self?.close()
                 }
             }
@@ -170,7 +171,7 @@ import AUIRoomCore
     }
     
     public let roomController: ARTCVoiceRoomEngine
-    open var roomInfo: AUIVoiceRoomInfo {
+    open var roomInfo: ARTCVoiceRoomInfo {
         return self.roomController.roomInfo
     }
     
@@ -267,22 +268,74 @@ import AUIRoomCore
     }()
     
     public lazy var bottomView: AUIVoiceRoomBottomView = {
-        let view = AUIVoiceRoomBottomView()
+        let view = AUIVoiceRoomBottomView(isAnchor: self.roomController.isAnchor)
+        view.soundEffectBtn.isEnabled = self.roomController.isJoinMic
+        view.mixerBtn.isEnabled = self.roomController.isJoinMic
         view.commentTextField.sendCommentBlock = {[weak self] sender, comment in
             self?.roomController.sendTextMessage(text: comment, completed: { error in
                 if error != nil {
                     if let self = self {
-                        AVToastView.show("发送评论失败：\(error!.auiMessage)", view: self.view, position: .mid)
+                        AVToastView.show("发送评论失败：\(error!.artcMessage)", view: self.view, position: .mid)
                     }
                 }
             })
         }
         view.soundEffectBtn.clickBlock = { [weak self] btn in
             let panel = AUIVoiceRoomSoundEffectPanel(frame: CGRect(x: 0, y: 0, width: self!.view.av_width, height: 0))
+            panel.tryPlayBlock = { item, isPlaying in
+                self?.roomController.startPlayAudioEffect(effectId: item.effectId, localPath: AUIVoiceRoomBundle.getResourceFullPath(item.localPath), volume: item.volume, onlyLocalPlay: false)
+            }
+            panel.applyPlayBlock = { item, isPlaying in
+                self?.roomController.startPlayAudioEffect(effectId: item.effectId, localPath: AUIVoiceRoomBundle.getResourceFullPath(item.localPath), volume: item.volume, onlyLocalPlay: true)
+            }
+            panel.volumeBlock = { item in
+                self?.roomController.setAudioEffectVolume(effectId: item.effectId, volume: item.volume)
+            }
             panel.show(on: self!.view, with: .clickToClose)
+        }
+        view.bgMusicBtn?.clickBlock = { [weak self] btn in
+            let panel = AUIVoiceRoomMusicPanel(frame: CGRect(x: 0, y: 0, width: self!.view.av_width, height: 0))
+            panel.playingStatus = self?.roomController.bgMusicStatus
+            panel.updateRecordingVolume(volume: self?.roomController.getRecordingVolume() ?? 50)
+            panel.applyPlayBlock = { item, volume, isPlaying in
+                if isPlaying == true {
+                    self?.roomController.stopPlayBackgroundMusic()
+                }
+                else {
+                    self?.roomController.startPlayBackgroundMusic(musicId: item.songId, localPath: AUIVoiceRoomBundle.getResourceFullPath(item.localPath), volume: volume, onlyLocalPlay: false)
+                }
+            }
+            panel.tryPlayBlock = { item, volume, isPlaying in
+                if isPlaying == true {
+                    self?.roomController.stopPlayBackgroundMusic()
+                }
+                else {
+                    self?.roomController.startPlayBackgroundMusic(musicId: item.songId, localPath: AUIVoiceRoomBundle.getResourceFullPath(item.localPath), volume: volume, onlyLocalPlay: true)
+                }
+            }
+            panel.musicVolumeBlock = { value in
+                self?.roomController.setBackgroundMusicVolume(volume: value)
+            }
+            panel.recordingVolumeBlock = { value in
+                self?.roomController.setRecordingVolume(volume: value)
+            }
+            panel.show(on: self!.view, with: .clickToClose)
+            self?.roomController.addObserver(delegate: panel)
         }
         view.mixerBtn.clickBlock = { [weak self] btn in
             let panel = AUIVoiceRoomMixerPanel(frame: CGRect(x: 0, y: 0, width: self!.view.av_width, height: 0))
+            panel.updateVoiceReverbMode(mode: self?.roomController.getVoiceReverbMode() ?? .Off)
+            panel.updateVoiceChangerMode(mode: self?.roomController.getVoiceChangerMode() ?? .Off)
+            panel.updateIsEarBack(on: self?.roomController.getIsEarBack() ?? false)
+            panel.voiceReverbSelectedBlock = { mode in
+                self?.roomController.setVoiceReverbMode(mode: mode)
+            }
+            panel.voiceChangerSelectedBlock = { mode in
+                self?.roomController.setVoiceChangerMode(mode: mode)
+            }
+            panel.switchEarBackBlock = { on in
+                self?.roomController.switchEarBack(on: on)
+            }
             panel.show(on: self!.view, with: .clickToClose)
         }
         view.switchSpeakerBtn.clickBlock = { [weak self] btn in
@@ -351,12 +404,12 @@ import AUIRoomCore
                                     panel?.hide()
                                 }
                                 else {
-                                    let code = AUIRoomError.getErrorCode(error: error)
+                                    let code = ARTCRoomError.getErrorCode(error: error)
                                     if code == .JoinedMicErrorForNotIndex {
                                         AVToastView.show("麦上人员已满，请稍后尝试", view: self!.view, position: .mid)
                                     }
                                     else {
-                                        AVToastView.show("上麦失败：\(error!.auiMessage))", view: self!.view, position: .mid)
+                                        AVToastView.show("上麦失败：\(error!.artcMessage))", view: self!.view, position: .mid)
                                     }
                                 }
                             })
@@ -374,15 +427,19 @@ import AUIRoomCore
             self.micBtn.isJoined = true
             self.bottomView.switchMicrophoneBtn.isSelected = micSeatInfo.isMuteMic
             self.bottomView.switchMicrophoneBtn.isEnabled = true
+            self.bottomView.soundEffectBtn.isEnabled = true
+            self.bottomView.mixerBtn.isEnabled = true
         }
         else {
             self.micBtn.isJoined = false
             self.bottomView.switchMicrophoneBtn.isSelected = false
             self.bottomView.switchMicrophoneBtn.isEnabled = false
+            self.bottomView.soundEffectBtn.isEnabled = false
+            self.bottomView.mixerBtn.isEnabled = false
         }
     }
     
-    open func insertComment(text: String, sender: AUIRoomUser) {
+    open func insertComment(text: String, sender: ARTCRoomUser) {
         let model = AVCommentModel()
         model.sentContent = text
         model.useFlag = true;
@@ -436,11 +493,11 @@ extension AUIVoiceRoomViewController: ARTCVoiceRoomEngineDelegate {
         }
     }
     
-    open func onJoinedRoom(user: AUIRoomUser) {
+    open func onJoinedRoom(user: ARTCRoomUser) {
         self.insertTips("\(user.getFinalNick()) 进入房间")
     }
     
-    open func onLeavedRoom(user: AUIRoomUser) {
+    open func onLeavedRoom(user: ARTCRoomUser) {
         
     }
     
@@ -455,7 +512,7 @@ extension AUIVoiceRoomViewController: ARTCVoiceRoomEngineDelegate {
         self.memberBtn.updateCount(count: count)
     }
     
-    open func onJoinedMic(seatIndex: Int32, user: AUIRoomUser) {
+    open func onJoinedMic(seatIndex: Int32, user: ARTCRoomUser) {
         self.insertTips("\(user.getFinalNick()) 上 \(seatIndex) 号麦")
         self.micSeatView.updateMicSeatInfo(seatIndex: seatIndex)
         if user.userId == self.roomController.me.userId {
@@ -463,7 +520,7 @@ extension AUIVoiceRoomViewController: ARTCVoiceRoomEngineDelegate {
         }
     }
     
-    open func onLeavedMic(seatIndex: Int32, user: AUIRoomUser) {
+    open func onLeavedMic(seatIndex: Int32, user: ARTCRoomUser) {
         self.insertTips("\(user.getFinalNick()) 下 \(seatIndex) 号麦")
         self.micSeatView.updateMicSeatInfo(seatIndex: seatIndex)
         if user.userId == self.roomController.me.userId {
@@ -472,11 +529,11 @@ extension AUIVoiceRoomViewController: ARTCVoiceRoomEngineDelegate {
         }
     }
     
-    open func onMicUserStreamChanged(seatIndex: Int32, user: AUIRoomUser, publishing: Bool) {
+    open func onMicUserStreamChanged(seatIndex: Int32, user: ARTCRoomUser, publishing: Bool) {
         self.micSeatView.updateNetworkStatus(uid: user.userId)
     }
     
-    open func onMicUserMicrophoneChanged(seatIndex: Int32, user: AUIRoomUser, off: Bool) {
+    open func onMicUserMicrophoneChanged(seatIndex: Int32, user: ARTCRoomUser, off: Bool) {
         self.micSeatView.updateMuteMic(seatIndex: seatIndex)
         if user.userId == self.roomController.me.userId {
             if let micSeatInfo = self.roomController.micSeatInfo {
@@ -489,13 +546,13 @@ extension AUIVoiceRoomViewController: ARTCVoiceRoomEngineDelegate {
         }
     }
     
-    open func onNetworkStateChanged(user: AUIRoomUser, state: String) {
+    open func onNetworkStateChanged(user: ARTCRoomUser, state: String) {
         if user.userId == self.roomController.me.userId {
             var status = AVNetworkStatus.fluent
-            if state == AUIRoomNetworkState.Good.rawValue {
+            if state == ARTCRoomNetworkState.Good.rawValue {
                 status = AVNetworkStatus.fluent
             }
-            else if state == AUIRoomNetworkState.Poor.rawValue {
+            else if state == ARTCRoomNetworkState.Poor.rawValue {
                 status = AVNetworkStatus.stuttering
             }
             else {
@@ -511,7 +568,13 @@ extension AUIVoiceRoomViewController: ARTCVoiceRoomEngineDelegate {
         self.micSeatView.updateSpeaking(seatIndex: seatIndex, isSpeaking: isSpeaking)
     }
     
-    open func onReceivedTextMessage(user: AUIRoomUser, text: String) {
+    public func onBackgroundMusicStatusChanged(status: ARTCVoiceRoomAudioPlayingStatus) {
+        if status.playState == .Failed {
+            AVToastView.show("播放背景音乐失败", view: self.view, position: .mid)
+        }
+    }
+    
+    open func onReceivedTextMessage(user: ARTCRoomUser, text: String) {
         self.insertComment(text: text, sender: user)
     }
 }

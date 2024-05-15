@@ -3,7 +3,7 @@ package com.aliyun.auikits.voicechat.model.entity;
 public class ChatRoom {
     private String id;
     private String title;
-    private int memberNum;
+    private int memberNum = 1;
 
     private ChatMember compere;
     private ChatMember self;

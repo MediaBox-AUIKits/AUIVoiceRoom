@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 
 import androidx.databinding.DataBindingUtil;
 
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
 import com.aliyun.auikits.voicechat.R;
 import com.aliyun.auikits.voicechat.databinding.VoicechatSoundEffectCardBinding;
 import com.aliyun.auikits.voicechat.base.card.BaseCard;
@@ -28,6 +29,13 @@ public class ChatSoundEffectCard extends BaseCard {
         this.binding.setViewModel(vm);
     }
 
+    @Override
+    public void bindEngine(ARTCVoiceRoomEngine engine) {
+        super.bindEngine(engine);
+        if(vm != null){
+            vm.bindEngine(engine);
+        }
+    }
 
     @Override
     public void onBind(CardEntity entity) {

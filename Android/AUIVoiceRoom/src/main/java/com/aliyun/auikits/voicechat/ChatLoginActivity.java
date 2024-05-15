@@ -1,6 +1,8 @@
 package com.aliyun.auikits.voicechat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -16,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alivc.auicommon.common.base.util.ThreadUtil;
 import com.alivc.auimessage.model.token.IMNewToken;
 import com.aliyun.auikits.voicechat.R;
 import com.aliyun.auikits.voicechat.databinding.VoicechatActivityLoginBinding;
@@ -35,7 +38,13 @@ import com.jaeger.library.StatusBarUtil;
 import com.orhanobut.hawk.Hawk;
 import com.permissionx.guolindev.PermissionX;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -62,6 +71,20 @@ public class ChatLoginActivity extends AppCompatActivity{
 
         StatusBarUtil.setTransparent(this);
         RxJavaPlugins.setErrorHandler(Functions.<Throwable>emptyConsumer());
+
+        Context ctx = this.getApplicationContext();
+        ThreadUtil.runOnSubThread(new Runnable() {
+            @Override
+            public void run() {
+                String targetPath = ctx.getExternalFilesDir(null).getPath();
+                File targetDirFile = new File(targetPath, "test_audios2");
+                if(targetDirFile.exists() && targetDirFile.isDirectory()){
+                    return;
+                }
+                unzipFromAssets(ctx, "test_audios2.zip", targetPath);
+                Log.d(TAG, "unzip resources done");
+            }
+        });
 
         binding = DataBindingUtil.setContentView(this, R.layout.voicechat_activity_login);
         binding.setLifecycleOwner(this);
@@ -252,5 +275,42 @@ public class ChatLoginActivity extends AppCompatActivity{
             ToastHelper.showToast(ChatLoginActivity.this, R.string.voicechat_login_failed, Toast.LENGTH_SHORT);
         }
     }
+    private static void unzipFromAssets(Context context, String zipFile, String destination) {
+        AssetManager assetManager = context.getAssets();
+        InputStream is;
+        ZipInputStream zis;
 
+        try {
+            String filename;
+            is = assetManager.open(zipFile);
+            zis = new ZipInputStream(is);
+            ZipEntry ze;
+
+            while ((ze = zis.getNextEntry()) != null) {
+                filename = ze.getName();
+
+                // Need to create directories if not exists, or it will generate an Exception...
+                if (ze.isDirectory()) {
+                    File fmd = new File(destination, filename);
+                    fmd.mkdirs();
+                    continue;
+                }
+
+                FileOutputStream fout = new FileOutputStream(new File(destination, filename));
+
+                byte[] buffer = new byte[1024];
+                int count;
+                while ((count = zis.read(buffer)) != -1) {
+                    fout.write(buffer, 0, count);
+                }
+
+                fout.close();
+                zis.closeEntry();
+            }
+
+            zis.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

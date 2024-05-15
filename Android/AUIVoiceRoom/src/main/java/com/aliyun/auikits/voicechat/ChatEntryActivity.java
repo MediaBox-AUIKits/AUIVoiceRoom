@@ -18,7 +18,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alivc.auimessage.model.token.IMNewToken;
-import com.aliyun.auikits.voicechat.R;
+import com.aliyun.auikits.biz.voiceroom.VoiceRoomServerConstant;
+import com.aliyun.auikits.rtc.ClientMode;
+import com.aliyun.auikits.single.server.Server;
+import com.aliyun.auikits.single.Singleton;
 import com.aliyun.auikits.voicechat.databinding.VoicechatActivityEntryBinding;
 import com.aliyun.auikits.voicechat.databinding.VoicechatDialogLoadingBinding;
 import com.aliyun.auikits.voicechat.base.card.CardEntity;
@@ -45,7 +48,7 @@ import com.aliyun.auikits.voicechat.widget.card.ChatRoomCard;
 import com.aliyun.auikits.voicechat.widget.card.DefaultCardViewFactory;
 import com.aliyun.auikits.voicechat.util.DisplayUtil;
 import com.aliyun.auikits.voicechat.widget.list.CustomViewHolder;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
 import com.aliyun.auikits.voiceroom.bean.NetworkState;
 import com.aliyun.auikits.voiceroom.bean.RoomInfo;
 import com.aliyun.auikits.voiceroom.bean.UserInfo;
@@ -122,6 +125,7 @@ public class ChatEntryActivity extends AppCompatActivity implements ContentViewM
 
         im_token = (IMNewToken) getIntent().getSerializableExtra(KEY_IM_TAG);
         authorization = getIntent().getStringExtra(KEY_AUTHORIZATION);
+        Singleton.getInstance(Server.class).setAuthorizeToken(authorization);
         String userId = getIntent().getStringExtra(KEY_USER_ID);
         if(im_token == null || authorization == null || userId == null) {
             Toast.makeText(ChatEntryActivity.this, R.string.voicechat_invalid_param, Toast.LENGTH_SHORT).show();
@@ -282,7 +286,7 @@ public class ChatEntryActivity extends AppCompatActivity implements ContentViewM
 
     private Observable<Integer> createJoinRoomObservable(ChatRoomItem chatRoomItem, ChatMember currentUser) {
         RoomInfo roomInfo = new RoomInfo(chatRoomItem.getId());
-        roomInfo.creator = chatRoomItem.getCompere().getId();
+        roomInfo.creator = chatRoomItem.getCompereUserInfo();
         String authorization = ChatEntryActivity.this.authorization;
         RtcTokenRequest rtcTokenRequest = new RtcTokenRequest();
         rtcTokenRequest.room_id = roomInfo.roomId;
@@ -293,20 +297,20 @@ public class ChatEntryActivity extends AppCompatActivity implements ContentViewM
                     @Override
                     public RtcInfo apply(RtcTokenResponse response) throws Throwable {
                         Log.v(TAG, "get rtc token  success");
-                        return new RtcInfo(response.auth_token, response.timestamp, ChatRoomApi.RTC_GLSB);
+                        return new RtcInfo(response.auth_token, response.timestamp, VoiceRoomServerConstant.RTC_GLSB);
                     }
                 });
 
         //房间初始化
-        Observable<AUIVoiceRoom> roomInitObservable = Observable.create(new ObservableOnSubscribe<AUIVoiceRoom>() {
+        Observable<ARTCVoiceRoomEngine> roomInitObservable = Observable.create(new ObservableOnSubscribe<ARTCVoiceRoomEngine>() {
             @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull ObservableEmitter<AUIVoiceRoom> emitter) throws Throwable {
-                AUIVoiceRoom auiVoiceRoom = ChatRoomManager.getInstance().createVoiceRoom(roomInfo.roomId);
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull ObservableEmitter<ARTCVoiceRoomEngine> emitter) throws Throwable {
+                ARTCVoiceRoomEngine auiVoiceRoom = ChatRoomManager.getInstance().createVoiceRoom(roomInfo.roomId);
                 UserInfo userInfo = new UserInfo(currentUser.getId(), currentUser.getId());
                 userInfo.userName = currentUser.getName();
                 userInfo.avatarUrl = currentUser.getAvatar();
 
-                auiVoiceRoom.init(ChatEntryActivity.this.getApplicationContext(),ChatRoomApi.APP_ID,  ChatEntryActivity.this.authorization, userInfo, ChatEntryActivity.this.im_token, new ActionCallback() {
+                auiVoiceRoom.init(ChatEntryActivity.this.getApplicationContext(), ClientMode.VOICE_ROOM, VoiceRoomServerConstant.APP_ID, userInfo, ChatEntryActivity.this.im_token, new ActionCallback() {
                     @Override
                     public void onResult(int code, String msg, Map<String, Object> params) {
                         if(code == ChatRoomManager.CODE_SUCCESS) {
@@ -340,7 +344,7 @@ public class ChatEntryActivity extends AppCompatActivity implements ContentViewM
                         if(chatRoomResponse.isRoomValid()) {
                             Log.v(TAG, "room is valid");
                             chatRoomItem.setMemberNum(chatRoomResponse.getOnlineCount());
-                            return ChatRoomService.joinRoom(((AUIVoiceRoom)rtcInfoAUIVoiceRoomPair[1]), roomInfo, (RtcInfo) rtcInfoAUIVoiceRoomPair[0]);
+                            return ChatRoomService.joinRoom(((ARTCVoiceRoomEngine)rtcInfoAUIVoiceRoomPair[1]), roomInfo, (RtcInfo) rtcInfoAUIVoiceRoomPair[0]);
                         }  else {
                             Log.v(TAG, "room is closed");
                             return Observable.error(new RuntimeException(ChatEntryActivity.this.getString(R.string.voicechat_room_closed)));

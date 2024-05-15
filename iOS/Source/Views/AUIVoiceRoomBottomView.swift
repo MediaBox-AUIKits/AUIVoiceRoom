@@ -11,16 +11,20 @@ import AUIFoundation
 
 open class AUIVoiceRoomBottomView: UIView {
     
-    public override init(frame: CGRect) {
+    public convenience init(isAnchor: Bool) {
+        self.init(frame: CGRect.zero, isAnchor: isAnchor)
+    }
+    
+    private init(frame: CGRect, isAnchor: Bool) {
         super.init(frame: frame)
         
-//        self.addSubview(self.mixerBtn)
-//        self.mixerBtn.snp.makeConstraints { make in
-//            make.right.equalToSuperview().offset(-14)
-//            make.top.equalToSuperview()
-//            make.width.height.equalTo(44)
-//        }
-//        
+        self.addSubview(self.mixerBtn)
+        self.mixerBtn.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-14)
+            make.top.equalToSuperview()
+            make.width.height.equalTo(44)
+        }
+        
 //        self.addSubview(self.soundEffectBtn)
 //        self.soundEffectBtn.snp.makeConstraints { make in
 //            make.right.equalTo(self.mixerBtn.snp.left)
@@ -28,10 +32,22 @@ open class AUIVoiceRoomBottomView: UIView {
 //            make.width.height.equalTo(44)
 //        }
         
+        if isAnchor {
+            let btn = AVBlockButton()
+            btn.imageEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
+            btn.setImage(AUIVoiceRoomBundle.getCommonImage("ic_bg_music"), for: .normal)
+            self.addSubview(btn)
+            btn.snp.makeConstraints { make in
+                make.right.equalTo(self.mixerBtn.snp.left)
+                make.top.equalToSuperview()
+                make.width.height.equalTo(44)
+            }
+            self.bgMusicBtn = btn
+        }
+        
         self.addSubview(self.switchMicrophoneBtn)
         self.switchMicrophoneBtn.snp.makeConstraints { make in
-//            make.right.equalTo(self.soundEffectBtn.snp.left)
-            make.right.equalToSuperview().offset(-14)
+            make.right.equalTo(self.bgMusicBtn != nil ? self.bgMusicBtn!.snp.left : self.mixerBtn.snp.left)
             make.top.equalToSuperview()
             make.width.height.equalTo(44)
         }
@@ -102,6 +118,8 @@ open class AUIVoiceRoomBottomView: UIView {
         return btn
     }()
     
+    public var bgMusicBtn: AVBlockButton? = nil
+    
     public lazy var commentTextField: AVCommentTextField = {
         let view = AVCommentTextField()
         view.layer.masksToBounds = true
@@ -125,7 +143,7 @@ open class AUIVoiceRoomBottomView: UIView {
             make.height.equalTo(32)
             make.top.equalToSuperview().offset(6)
         }
-        self.transform = CGAffineTransformMakeTranslation(0, -keyboardFrame.height + self.av_height - 44)
+        self.transform = CGAffineTransform(translationX: 0, y: -keyboardFrame.height + self.av_height - 44)
     }
     
     func onCommentEndEdit() {
@@ -136,6 +154,6 @@ open class AUIVoiceRoomBottomView: UIView {
             make.height.equalTo(32)
             make.top.equalToSuperview().offset(6)
         }
-        self.transform = CGAffineTransformIdentity
+        self.transform = CGAffineTransform.identity
     }
 }

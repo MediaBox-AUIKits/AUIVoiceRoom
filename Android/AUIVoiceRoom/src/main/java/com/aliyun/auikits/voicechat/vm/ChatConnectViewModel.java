@@ -20,11 +20,9 @@ import com.aliyun.auikits.voicechat.service.ChatRoomService;
 import com.aliyun.auikits.voicechat.util.DisplayUtil;
 import com.aliyun.auikits.voicechat.util.ToastHelper;
 import com.aliyun.auikits.voicechat.widget.list.CustomViewHolder;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
-import com.aliyun.auikits.voiceroom.AUIVoiceRoomCallback;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngineDelegate;
 import com.aliyun.auikits.voiceroom.bean.MicInfo;
-import com.aliyun.auikits.voiceroom.bean.MicRequestResult;
-import com.aliyun.auikits.voiceroom.bean.NetworkState;
 import com.aliyun.auikits.voiceroom.bean.UserInfo;
 import com.aliyun.auikits.voiceroom.callback.ActionCallback;
 import com.orhanobut.dialogplus.DialogPlus;
@@ -38,15 +36,15 @@ import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class ChatConnectViewModel extends ViewModel {
-    //是否主持人模式
-    public ObservableBoolean isCompereMode = new ObservableBoolean();
+    //是否显示连麦入口
+    public ObservableBoolean showMicEntry = new ObservableBoolean();
     //是否上麦 - 非主持人模式使用
     public ObservableBoolean isChatConnected = new ObservableBoolean(false);
-    private AUIVoiceRoomCallback roomCallback;
-    private AUIVoiceRoom roomController;
+    private ARTCVoiceRoomEngineDelegate roomCallback;
+    private ARTCVoiceRoomEngine roomController;
 
-    public void bind(ChatRoom chatRoom, AUIVoiceRoom roomController) {
-        this.isCompereMode.set(chatRoom.isCompere());
+    public void bind(ChatRoom chatRoom, ARTCVoiceRoomEngine roomController) {
+        this.showMicEntry.set(!chatRoom.isCompere());
         this.isChatConnected.set(false);
         this.roomController = roomController;
         this.roomCallback = new ChatRoomCallback() {
@@ -75,19 +73,19 @@ public class ChatConnectViewModel extends ViewModel {
                     });
                 }
 
-                ChatConnectViewModel.this.roomController.removeRoomCallback(this);
+                ChatConnectViewModel.this.roomController.removeObserver(this);
                 ChatConnectViewModel.this.roomCallback = null;
             }
 
         };
-        this.roomController.addRoomCallback(this.roomCallback);
+        this.roomController.addObserver(this.roomCallback);
 
 
     }
 
     public void unBind() {
         if(this.roomCallback != null) {
-            this.roomController.removeRoomCallback(this.roomCallback);
+            this.roomController.removeObserver(this.roomCallback);
         }
     }
     
@@ -162,5 +160,9 @@ public class ChatConnectViewModel extends ViewModel {
         }
 
 
+    }
+
+    public ObservableBoolean getShowMicEntryObservable(){
+        return showMicEntry;
     }
 }

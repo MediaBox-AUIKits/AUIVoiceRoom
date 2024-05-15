@@ -150,4 +150,21 @@
     }
 }
 
+- (void)onGroup:(NSString *)groupId onlineCountChanged:(NSInteger)onlineCount {
+    if ([NSThread isMainThread]) {
+        NSEnumerator<id<AUIMessageListenerProtocol>>* enumerator = [[self.observerList copy] objectEnumerator];
+        id<AUIMessageListenerProtocol> observer = nil;
+        while ((observer = [enumerator nextObject])) {
+            if ([observer respondsToSelector:@selector(onGroup:onlineCountChanged:)]) {
+                [observer onGroup:groupId onlineCountChanged:onlineCount];
+            }
+        }
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onGroup:groupId onlineCountChanged:onlineCount];
+        });
+    }
+}
+
 @end

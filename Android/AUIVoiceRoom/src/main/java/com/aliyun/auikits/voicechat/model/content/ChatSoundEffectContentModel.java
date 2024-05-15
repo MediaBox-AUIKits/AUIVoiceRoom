@@ -13,6 +13,7 @@ import com.aliyun.auikits.voicechat.base.feed.IContentObserver;
 import com.aliyun.auikits.voicechat.model.entity.ChatMusicItem;
 import com.aliyun.auikits.voicechat.widget.card.CardTypeDef;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +23,15 @@ import java.util.List;
 public class ChatSoundEffectContentModel extends AbsContentModel<CardEntity> {
 
 
-    private ChatMusicItem[] musicArray;
+    private List<ChatMusicItem> musicArray = new ArrayList<>();
 
-    private int lastPlayingItem = -1;
+    private Context mContext;
+    private static String FOLDER_NAME = "test_audios2/audio_effect";
+    private String mPlayUrl = null;
+    private boolean mApplying = false;
 
     public ChatSoundEffectContentModel(Context context) {
-        musicArray = new ChatMusicItem[] {
-                new ChatMusicItem("1", context.getString(R.string.voicechat_laughter), "", ""),
-                new ChatMusicItem("2", context.getString(R.string.voicechat_applause), "", ""),
-        };
+        mContext = context;
     }
 
     @Override
@@ -38,6 +39,11 @@ public class ChatSoundEffectContentModel extends AbsContentModel<CardEntity> {
         ThreadUtil.runOnSubThread(new Runnable() {
             @Override
             public void run() {
+                musicArray.clear();
+                musicArray.add(new ChatMusicItem("1", mContext.getString(R.string.voicechat_open), "",
+                        new File(mContext.getExternalFilesDir(null), String.format("%s/开场.aac", FOLDER_NAME)).getAbsolutePath()));
+                musicArray.add(new ChatMusicItem("2", mContext.getString(R.string.voicechat_applause), "",
+                        new File(mContext.getExternalFilesDir(null), String.format("%s/鼓掌.aac", FOLDER_NAME)).getAbsolutePath()));
                 List<CardEntity> cardEntityList = getCardDataList();
 
                 ThreadUtil.runOnUiThread(new Runnable() {
@@ -59,48 +65,50 @@ public class ChatSoundEffectContentModel extends AbsContentModel<CardEntity> {
     public void fetchData(boolean isPullToRefresh, BizParameter parameter, IBizCallback<CardEntity> callback) {
     }
 
-    public void playOrStopItem(int position) {
-        ThreadUtil.runOnSubThread(new Runnable() {
+    public void notifyContentUpdate() {
+        List<CardEntity> cardEntityList = getCardDataList();
+        ThreadUtil.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                List<CardEntity> cardEntityList = getCardDataList();
-
-                CardEntity cardEntity = cardEntityList.get(position);
-                if(lastPlayingItem == -1) {
-                    ((ChatMusicItem)cardEntity.bizData).setPlaying(true);
-                    lastPlayingItem = position;
-                } else if(position == lastPlayingItem) {
-                    ((ChatMusicItem)cardEntity.bizData).setPlaying(false);
-                    lastPlayingItem = -1;
-                } else {
-                    ((ChatMusicItem)cardEntity.bizData).setPlaying(true);
-                    lastPlayingItem = position;
+                for(IContentObserver<CardEntity> observer : ChatSoundEffectContentModel.this.observers) {
+                    observer.onContentUpdate(cardEntityList);
                 }
-
-                ThreadUtil.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for(IContentObserver<CardEntity> observer : ChatSoundEffectContentModel.this.observers) {
-                            observer.onContentUpdate(cardEntityList);
-                        }
-                    }
-                });
-
             }
         });
     }
 
     private List<CardEntity> getCardDataList() {
         List<CardEntity> cardDataList = new ArrayList<>();
-        for(int i = 0; i <= 1; i++) {
+        for(int i = 0; i < musicArray.size(); i++) {
             CardEntity cardEntity = new CardEntity();
             cardEntity.cardType = CardTypeDef.CHAT_SOUND_EFFECT_CARD;
-            ChatMusicItem chatMusicItem = musicArray[i];
-            chatMusicItem.setPlaying(false);
+            ChatMusicItem chatMusicItem = musicArray.get(i);
             cardEntity.bizData = chatMusicItem;
             cardDataList.add(cardEntity);
         }
 
         return cardDataList;
+    }
+
+    public CardEntity getTargetData(int pos){
+        List<CardEntity> cardList = getCardDataList();
+        if(pos < cardList.size())
+            return cardList.get(pos);
+        return null;
+    }
+
+    //更新播放源
+    public void onUpdatePlaySource(String url){
+        mPlayUrl = url;
+    }
+
+    //更新applying状态
+    public void onUpdateApplyState(boolean apply){
+        mApplying = apply;
+    }
+
+    //更新播放状态
+    public void onUpdatePlayState(boolean play){
+
     }
 }

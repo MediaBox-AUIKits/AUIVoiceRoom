@@ -3,7 +3,7 @@ package com.aliyun.auikits.voicechat.service;
 
 import android.util.Log;
 
-import com.aliyun.auikits.voiceroom.AUIVoiceRoom;
+import com.aliyun.auikits.voice.ARTCVoiceRoomEngine;
 import com.aliyun.auikits.voiceroom.factory.AUIVoiceRoomFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +12,7 @@ public class ChatRoomManager {
     private static final String TAG = "ChatRoomManager";
     public static final int CODE_SUCCESS = 0;
     private ConcurrentHashMap<String, Object> globalParams = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, AUIVoiceRoom> roomMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ARTCVoiceRoomEngine> roomMap = new ConcurrentHashMap<>();
 
     private ChatRoomManager() {
 
@@ -26,8 +26,8 @@ public class ChatRoomManager {
         return ChatRoomManagerInstance.instance;
     }
 
-    public AUIVoiceRoom createVoiceRoom(String roomId) {
-        AUIVoiceRoom room = this.roomMap.get(roomId);
+    public ARTCVoiceRoomEngine createVoiceRoom(String roomId) {
+        ARTCVoiceRoomEngine room = this.roomMap.get(roomId);
         if(room == null) {
             room = AUIVoiceRoomFactory.createVoiceRoom();
 
@@ -40,16 +40,16 @@ public class ChatRoomManager {
         return room;
     }
 
-    public AUIVoiceRoom getVoiceRoom(String roomId) {
+    public ARTCVoiceRoomEngine getVoiceRoom(String roomId) {
         return this.roomMap.get(roomId);
     }
 
-    public void destroyVoiceRoom(AUIVoiceRoom roomController) {
+    public void destroyVoiceRoom(ARTCVoiceRoomEngine roomController) {
         destroyVoiceRoom(roomController.getRoomInfo().roomId);
     }
 
     public void destroyVoiceRoom(String roomId) {
-        AUIVoiceRoom auiVoiceRoom = getVoiceRoom(roomId);
+        ARTCVoiceRoomEngine auiVoiceRoom = getVoiceRoom(roomId);
         if(auiVoiceRoom != null) {
             auiVoiceRoom.release();
             Log.v(TAG, "destroy RoomController :" + auiVoiceRoom.hashCode());
@@ -67,7 +67,7 @@ public class ChatRoomManager {
     }
 
     public void destroy() {
-        for(AUIVoiceRoom room : this.roomMap.values()) {
+        for(ARTCVoiceRoomEngine room : this.roomMap.values()) {
             room.release();
         }
         this.roomMap.clear();
