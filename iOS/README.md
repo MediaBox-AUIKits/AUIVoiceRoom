@@ -37,11 +37,10 @@ AUI Kits 语聊房场景集成工具是阿里云提供的跨平台音视频实�
 - 源码下载后，进入Example目录
 - 在Example目录里执行命令“pod install  --repo-update”，自动安装依赖SDK
 - 打开工程文件“AUIVoiceRoomExample.xcworkspace”，修改包Id
-- 完成前提条件后，进入文件AUIRoomService.swift，修改服务端域名
+- 完成前提条件后，进入文件AUIVoiceRoomManager.swift，修改服务端域名
 ```swift
-// AUIRoomService.swift
-let AppServerDomain = "你的应用服务器域名"
-
+// AUIVoiceRoomManager.swift
+let VoiceRoomServerDomain = "你的应用服务器域名"
 ```
 - 完成前提条件后，进入文件AUIRoomCommon.swift，修改互动直播应用appID
 ```swift
