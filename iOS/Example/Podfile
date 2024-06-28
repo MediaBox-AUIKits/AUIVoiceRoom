@@ -12,6 +12,7 @@ target 'Example' do
   pod 'SDWebImage', '~> 5.15.4'
   pod "#{AlivcSDK}", '~> 6.8.0'
 
+  pod "AUIRoomCore/VoiceRoomAPI", :path => '../AUIRoomCore/'
   pod "AUIRoomCore/#{AlivcSDK}", :path => '../AUIRoomCore/'
   pod 'AUIFoundation/All', :path => '../AUIBaseKits/AUIFoundation/'
   pod 'AUIMessage/AliVCIM', :path => '../AUIBaseKits/AUIMessage/'
