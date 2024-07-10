@@ -42,9 +42,9 @@ AUI Kits 语聊房场景集成工具是阿里云提供的跨平台音视频实�
 // AUIVoiceRoomManager.swift
 let VoiceRoomServerDomain = "你的应用服务器域名"
 ```
-- 完成前提条件后，进入文件AUIRoomCommon.swift，修改互动直播应用appID
+- 完成前提条件后，进入文件ARTCRoomRTCService.swift，修改互动直播应用appID
 ```swift
-// AUIRoomCommon.swift
+// ARTCRoomRTCService.swift
 @objcMembers public class AUIRoomConfig: NSObject {
     
     public var appId = "你的appID"
